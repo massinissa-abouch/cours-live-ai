@@ -43,12 +43,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Compte créé ! Vérifie ton email si demandé.");
+        toast.success("Compte créé !");
+        navigate({ to: "/onboarding" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        navigate({ to: "/dashboard" });
       }
-      navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur");
     } finally {
