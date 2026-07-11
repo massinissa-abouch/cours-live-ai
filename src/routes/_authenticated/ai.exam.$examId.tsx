@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { getExam, submitExam } from "@/lib/ai-revision.functions";
 
-export const Route = createFileRoute("/_authenticated/ai/exam/")({
+export const Route = createFileRoute("/_authenticated/ai/exam/$examId")({
   component: ExamPage,
 });
 

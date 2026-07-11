@@ -14,7 +14,7 @@ import {
 } from "@/lib/ai-conversations.functions";
 import { generateRevisionSheet } from "@/lib/ai-revision.functions";
 
-export const Route = createFileRoute("/_authenticated/ai/c/")({
+export const Route = createFileRoute("/_authenticated/ai/c/$conversationId")({
   component: ChatPage,
 });
 
