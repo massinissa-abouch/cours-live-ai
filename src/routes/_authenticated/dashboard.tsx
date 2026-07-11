@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Video, Sparkles, LogOut } from "lucide-react";
+import { BookOpen, Video, Sparkles, LogOut, GraduationCap } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -9,6 +10,18 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
+  const [isTeacher, setIsTeacher] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data: prof } = await supabase
+        .from("student_profiles").select("school_level").eq("user_id", user.id).maybeSingle();
+      if (!prof?.school_level) { navigate({ to: "/onboarding" }); return; }
+      const { data: roles } = await supabase
+        .from("user_roles").select("role").eq("user_id", user.id);
+      setIsTeacher((roles ?? []).some((r) => r.role === "teacher"));
+    })();
+  }, [user.id, navigate]);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -55,6 +68,20 @@ function Dashboard() {
             </Link>
           ))}
         </div>
+
+        {isTeacher && (
+          <Link to="/teacher"
+            className="mt-6 flex items-center justify-between rounded-2xl border border-primary/30 bg-primary/5 p-5 transition hover:bg-primary/10">
+            <div className="flex items-center gap-3">
+              <GraduationCap className="h-6 w-6 text-primary" />
+              <div>
+                <div className="font-semibold">Espace prof</div>
+                <div className="text-sm text-muted-foreground">Publie tes cours et gère tes créneaux</div>
+              </div>
+            </div>
+            <span className="text-primary">→</span>
+          </Link>
+        )}
 
         <div className="mt-10 rounded-2xl border border-dashed border-border bg-secondary/50 p-6">
           <p className="text-sm text-muted-foreground">
