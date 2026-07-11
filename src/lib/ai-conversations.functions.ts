@@ -167,7 +167,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
     const { text } = await generateText({
       model,
       system: systemPrompt(conv.subject, conv.level, conv.chapter, data.mode, data.hintLevel),
-      messages: modelMessages,
+      messages: modelMessages as never,
     });
 
     await context.supabase.from("ai_messages").insert({

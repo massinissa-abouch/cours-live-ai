@@ -19,7 +19,7 @@ export const getSessionDetail = createServerFn({ method: "POST" })
       .from("session_bookings")
       .select("id", { count: "exact", head: true })
       .eq("session_id", session.id)
-      .in("status", ["pending", "confirmed"]);
+      .in("status", ["booked", "attended"]);
 
     const { data: myBooking } = await context.supabase
       .from("session_bookings")
@@ -53,7 +53,7 @@ export const bookSession = createServerFn({ method: "POST" })
       .from("session_bookings")
       .select("id", { count: "exact", head: true })
       .eq("session_id", session.id)
-      .in("status", ["pending", "confirmed"]);
+      .in("status", ["booked", "attended"]);
     if ((count ?? 0) >= session.max_students) {
       throw new Error("La session est complète");
     }
@@ -61,7 +61,7 @@ export const bookSession = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("session_bookings").insert({
       session_id: session.id,
       student_id: context.userId,
-      status: "pending",
+      status: "booked",
       mode: data.mode,
     });
     if (error) throw error;
@@ -100,7 +100,7 @@ export const sendLiveQuiz = createServerFn({ method: "POST" })
       .insert({
         session_id: data.sessionId,
         question: data.question,
-        options: data.options as unknown as object,
+        options: data.options as never,
         correct_answer: data.correctAnswer,
       })
       .select("id")

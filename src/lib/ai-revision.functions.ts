@@ -140,7 +140,7 @@ Génère exactement ${data.questionCount} questions en français, alignées sur 
         level: data.level ?? null,
         chapter: data.chapter ?? null,
         duration_min: data.durationMin,
-        questions: questions as unknown as object,
+        questions: questions as never,
       })
       .select("id")
       .single();
@@ -208,8 +208,8 @@ Barème : chaque question sur 3 points, note finale ramenée sur 20.`,
     await context.supabase
       .from("ai_exams")
       .update({
-        answers: data.answers as unknown as object,
-        grading: grading as unknown as object,
+        answers: data.answers as never,
+        grading: grading as never,
         score: grading.score,
         finished_at: new Date().toISOString(),
       })
