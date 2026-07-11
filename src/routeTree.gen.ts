@@ -22,7 +22,9 @@ import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
+import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
+import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_authenticated/ai.sheets.$sheetId'
 import { Route as AuthenticatedAiExamNewRouteImport } from './routes/_authenticated/ai.exam.new'
 import { Route as AuthenticatedAiExamRouteImport } from './routes/_authenticated/ai.exam.'
 import { Route as AuthenticatedAiCRouteImport } from './routes/_authenticated/ai.c.'
@@ -93,11 +95,22 @@ const AuthenticatedTeacherAvailabilityRoute =
     path: '/teacher/availability',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAiSheetsRoute = AuthenticatedAiSheetsRouteImport.update({
+  id: '/sheets',
+  path: '/sheets',
+  getParentRoute: () => AuthenticatedAiRoute,
+} as any)
 const AuthenticatedTeacherCoursesNewRoute =
   AuthenticatedTeacherCoursesNewRouteImport.update({
     id: '/teacher/courses/new',
     path: '/teacher/courses/new',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAiSheetsSheetIdRoute =
+  AuthenticatedAiSheetsSheetIdRouteImport.update({
+    id: '/$sheetId',
+    path: '/$sheetId',
+    getParentRoute: () => AuthenticatedAiSheetsRoute,
   } as any)
 const AuthenticatedAiExamNewRoute = AuthenticatedAiExamNewRouteImport.update({
   id: '/exam/new',
@@ -125,12 +138,14 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/ai/c/': typeof AuthenticatedAiCRoute
   '/ai/exam/': typeof AuthenticatedAiExamRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
+  '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
 export interface FileRoutesByTo {
@@ -142,12 +157,14 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/ai/c': typeof AuthenticatedAiCRoute
   '/ai/exam': typeof AuthenticatedAiExamRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
+  '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
 export interface FileRoutesById {
@@ -162,12 +179,14 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/ai/c/': typeof AuthenticatedAiCRoute
   '/_authenticated/ai/exam/': typeof AuthenticatedAiExamRoute
   '/_authenticated/ai/exam/new': typeof AuthenticatedAiExamNewRoute
+  '/_authenticated/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
 export interface FileRouteTypes {
@@ -182,12 +201,14 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
+    | '/ai/sheets'
     | '/teacher/availability'
     | '/ai/'
     | '/teacher/'
     | '/ai/c/'
     | '/ai/exam/'
     | '/ai/exam/new'
+    | '/ai/sheets/$sheetId'
     | '/teacher/courses/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -199,12 +220,14 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
+    | '/ai/sheets'
     | '/teacher/availability'
     | '/ai'
     | '/teacher'
     | '/ai/c'
     | '/ai/exam'
     | '/ai/exam/new'
+    | '/ai/sheets/$sheetId'
     | '/teacher/courses/new'
   id:
     | '__root__'
@@ -218,12 +241,14 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
+    | '/_authenticated/ai/sheets'
     | '/_authenticated/teacher/availability'
     | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
     | '/_authenticated/ai/c/'
     | '/_authenticated/ai/exam/'
     | '/_authenticated/ai/exam/new'
+    | '/_authenticated/ai/sheets/$sheetId'
     | '/_authenticated/teacher/courses/new'
   fileRoutesById: FileRoutesById
 }
@@ -329,12 +354,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeacherAvailabilityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ai/sheets': {
+      id: '/_authenticated/ai/sheets'
+      path: '/sheets'
+      fullPath: '/ai/sheets'
+      preLoaderRoute: typeof AuthenticatedAiSheetsRouteImport
+      parentRoute: typeof AuthenticatedAiRoute
+    }
     '/_authenticated/teacher/courses/new': {
       id: '/_authenticated/teacher/courses/new'
       path: '/teacher/courses/new'
       fullPath: '/teacher/courses/new'
       preLoaderRoute: typeof AuthenticatedTeacherCoursesNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ai/sheets/$sheetId': {
+      id: '/_authenticated/ai/sheets/$sheetId'
+      path: '/$sheetId'
+      fullPath: '/ai/sheets/$sheetId'
+      preLoaderRoute: typeof AuthenticatedAiSheetsSheetIdRouteImport
+      parentRoute: typeof AuthenticatedAiSheetsRoute
     }
     '/_authenticated/ai/exam/new': {
       id: '/_authenticated/ai/exam/new'
@@ -360,7 +399,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAiSheetsRouteChildren {
+  AuthenticatedAiSheetsSheetIdRoute: typeof AuthenticatedAiSheetsSheetIdRoute
+}
+
+const AuthenticatedAiSheetsRouteChildren: AuthenticatedAiSheetsRouteChildren = {
+  AuthenticatedAiSheetsSheetIdRoute: AuthenticatedAiSheetsSheetIdRoute,
+}
+
+const AuthenticatedAiSheetsRouteWithChildren =
+  AuthenticatedAiSheetsRoute._addFileChildren(
+    AuthenticatedAiSheetsRouteChildren,
+  )
+
 interface AuthenticatedAiRouteChildren {
+  AuthenticatedAiSheetsRoute: typeof AuthenticatedAiSheetsRouteWithChildren
   AuthenticatedAiIndexRoute: typeof AuthenticatedAiIndexRoute
   AuthenticatedAiCRoute: typeof AuthenticatedAiCRoute
   AuthenticatedAiExamRoute: typeof AuthenticatedAiExamRoute
@@ -368,6 +421,7 @@ interface AuthenticatedAiRouteChildren {
 }
 
 const AuthenticatedAiRouteChildren: AuthenticatedAiRouteChildren = {
+  AuthenticatedAiSheetsRoute: AuthenticatedAiSheetsRouteWithChildren,
   AuthenticatedAiIndexRoute: AuthenticatedAiIndexRoute,
   AuthenticatedAiCRoute: AuthenticatedAiCRoute,
   AuthenticatedAiExamRoute: AuthenticatedAiExamRoute,
