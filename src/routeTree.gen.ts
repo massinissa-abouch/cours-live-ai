@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TeachersRouteImport } from './routes/teachers'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -21,6 +22,11 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
 
+const TeachersRoute = TeachersRouteImport.update({
+  id: '/teachers',
+  path: '/teachers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/teachers': typeof TeachersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/teachers': typeof TeachersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/teachers': typeof TeachersRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/courses'
     | '/sitemap.xml'
+    | '/teachers'
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/courses'
     | '/sitemap.xml'
+    | '/teachers'
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/courses'
     | '/sitemap.xml'
+    | '/teachers'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
@@ -163,10 +175,18 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CoursesRoute: typeof CoursesRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TeachersRoute: typeof TeachersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/teachers': {
+      id: '/teachers'
+      path: '/teachers'
+      fullPath: '/teachers'
+      preLoaderRoute: typeof TeachersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -282,6 +302,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CoursesRoute: CoursesRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TeachersRoute: TeachersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
