@@ -63,47 +63,46 @@
 
 :root {
   --radius: 0.875rem;
-  /* Warm parchment background, deep ink foreground */
-  --background: oklch(0.985 0.012 90);
-  --foreground: oklch(0.22 0.03 180);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.03 180);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.03 180);
-  /* Deep teal — scholarly, calm, Algerian tile-inspired */
-  --primary: oklch(0.42 0.09 190);
-  --primary-foreground: oklch(0.985 0.012 90);
-  /* Warm sand */
-  --secondary: oklch(0.94 0.03 80);
-  --secondary-foreground: oklch(0.28 0.05 190);
-  --muted: oklch(0.95 0.015 90);
-  --muted-foreground: oklch(0.48 0.03 180);
-  /* Amber accent — energetic highlight */
+  /* Modern dark: deep near-black with subtle teal tint */
+  --background: oklch(0.16 0.015 220);
+  --foreground: oklch(0.97 0.005 220);
+  --card: oklch(0.20 0.018 220);
+  --card-foreground: oklch(0.97 0.005 220);
+  --popover: oklch(0.20 0.018 220);
+  --popover-foreground: oklch(0.97 0.005 220);
+  /* Vibrant teal-cyan primary */
+  --primary: oklch(0.78 0.14 195);
+  --primary-foreground: oklch(0.16 0.03 220);
+  --secondary: oklch(0.26 0.02 220);
+  --secondary-foreground: oklch(0.97 0.005 220);
+  --muted: oklch(0.24 0.018 220);
+  --muted-foreground: oklch(0.68 0.02 220);
+  /* Warm amber accent */
   --accent: oklch(0.82 0.15 75);
-  --accent-foreground: oklch(0.22 0.05 190);
-  --destructive: oklch(0.58 0.22 25);
-  --destructive-foreground: oklch(0.985 0.012 90);
-  --border: oklch(0.9 0.02 90);
-  --input: oklch(0.92 0.02 90);
-  --ring: oklch(0.42 0.09 190);
+  --accent-foreground: oklch(0.18 0.03 220);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.97 0.005 220);
+  --border: oklch(0.28 0.02 220);
+  --input: oklch(0.26 0.02 220);
+  --ring: oklch(0.78 0.14 195);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0.012 90);
-  --sidebar-foreground: oklch(0.22 0.03 180);
-  --sidebar-primary: oklch(0.42 0.09 190);
-  --sidebar-primary-foreground: oklch(0.985 0.012 90);
-  --sidebar-accent: oklch(0.94 0.03 80);
-  --sidebar-accent-foreground: oklch(0.28 0.05 190);
-  --sidebar-border: oklch(0.9 0.02 90);
-  --sidebar-ring: oklch(0.42 0.09 190);
+  --sidebar: oklch(0.18 0.018 220);
+  --sidebar-foreground: oklch(0.97 0.005 220);
+  --sidebar-primary: oklch(0.78 0.14 195);
+  --sidebar-primary-foreground: oklch(0.16 0.03 220);
+  --sidebar-accent: oklch(0.26 0.02 220);
+  --sidebar-accent-foreground: oklch(0.97 0.005 220);
+  --sidebar-border: oklch(0.28 0.02 220);
+  --sidebar-ring: oklch(0.78 0.14 195);
   /* Gradients + shadows */
-  --gradient-hero: linear-gradient(135deg, oklch(0.42 0.09 190) 0%, oklch(0.55 0.11 200) 50%, oklch(0.7 0.14 85) 100%);
-  --gradient-warm: linear-gradient(180deg, oklch(0.98 0.02 85) 0%, oklch(0.94 0.04 80) 100%);
-  --shadow-soft: 0 4px 16px -4px oklch(0.42 0.09 190 / 0.15);
-  --shadow-lift: 0 12px 40px -12px oklch(0.42 0.09 190 / 0.25);
+  --gradient-hero: radial-gradient(1200px 600px at 20% 0%, oklch(0.35 0.12 200 / 0.35), transparent 60%), radial-gradient(900px 500px at 90% 20%, oklch(0.5 0.16 75 / 0.18), transparent 60%), linear-gradient(180deg, oklch(0.18 0.02 220), oklch(0.14 0.015 220));
+  --gradient-warm: linear-gradient(180deg, oklch(0.22 0.02 220) 0%, oklch(0.18 0.02 220) 100%);
+  --shadow-soft: 0 4px 20px -6px oklch(0 0 0 / 0.5);
+  --shadow-lift: 0 20px 60px -20px oklch(0 0 0 / 0.7), 0 0 0 1px oklch(1 0 0 / 0.04);
 }
 
 .dark {
