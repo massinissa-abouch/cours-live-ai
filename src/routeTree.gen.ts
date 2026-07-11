@@ -23,6 +23,7 @@ import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
+import { Route as AuthenticatedAiCRouteImport } from './routes/_authenticated/ai.c.'
 
 const TeachersRoute = TeachersRouteImport.update({
   id: '/teachers',
@@ -96,6 +97,11 @@ const AuthenticatedTeacherCoursesNewRoute =
     path: '/teacher/courses/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAiCRoute = AuthenticatedAiCRouteImport.update({
+  id: '/c/',
+  path: '/c/',
+  getParentRoute: () => AuthenticatedAiRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
+  '/ai/c/': typeof AuthenticatedAiCRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
 export interface FileRoutesByTo {
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
+  '/ai/c': typeof AuthenticatedAiCRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
 export interface FileRoutesById {
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
+  '/_authenticated/ai/c/': typeof AuthenticatedAiCRoute
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
 export interface FileRouteTypes {
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/teacher/availability'
     | '/ai/'
     | '/teacher/'
+    | '/ai/c/'
     | '/teacher/courses/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/teacher/availability'
     | '/ai'
     | '/teacher'
+    | '/ai/c'
     | '/teacher/courses/new'
   id:
     | '__root__'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/availability'
     | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
+    | '/_authenticated/ai/c/'
     | '/_authenticated/teacher/courses/new'
   fileRoutesById: FileRoutesById
 }
@@ -300,15 +312,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeacherCoursesNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ai/c/': {
+      id: '/_authenticated/ai/c/'
+      path: '/c'
+      fullPath: '/ai/c/'
+      preLoaderRoute: typeof AuthenticatedAiCRouteImport
+      parentRoute: typeof AuthenticatedAiRoute
+    }
   }
 }
 
 interface AuthenticatedAiRouteChildren {
   AuthenticatedAiIndexRoute: typeof AuthenticatedAiIndexRoute
+  AuthenticatedAiCRoute: typeof AuthenticatedAiCRoute
 }
 
 const AuthenticatedAiRouteChildren: AuthenticatedAiRouteChildren = {
   AuthenticatedAiIndexRoute: AuthenticatedAiIndexRoute,
+  AuthenticatedAiCRoute: AuthenticatedAiCRoute,
 }
 
 const AuthenticatedAiRouteWithChildren = AuthenticatedAiRoute._addFileChildren(
