@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
@@ -66,6 +67,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAiRoute = AuthenticatedAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTeacherIndexRoute =
   AuthenticatedTeacherIndexRouteImport.update({
     id: '/teacher/',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
+  '/ai': typeof AuthenticatedAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
+  '/ai': typeof AuthenticatedAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
+  '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/sitemap.xml'
     | '/teachers'
+    | '/ai'
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/sitemap.xml'
     | '/teachers'
+    | '/ai'
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/sitemap.xml'
     | '/teachers'
+    | '/_authenticated/ai'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
@@ -243,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ai': {
+      id: '/_authenticated/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AuthenticatedAiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/teacher/': {
       id: '/_authenticated/teacher/'
       path: '/teacher'
@@ -268,6 +287,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
@@ -276,6 +296,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
