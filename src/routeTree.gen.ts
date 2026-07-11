@@ -22,6 +22,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
+import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedLiveSessionIdRouteImport } from './routes/_authenticated/live.$sessionId'
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
@@ -96,6 +97,11 @@ const AuthenticatedAiIndexRoute = AuthenticatedAiIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAiRoute,
 } as any)
+const ApiChatConversationIdRoute = ApiChatConversationIdRouteImport.update({
+  id: '/api/chat/$conversationId',
+  path: '/api/chat/$conversationId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTeacherAvailabilityRoute =
   AuthenticatedTeacherAvailabilityRouteImport.update({
     id: '/teacher/availability',
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/_authenticated/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/ai/sheets'
     | '/live/$sessionId'
     | '/teacher/availability'
+    | '/api/chat/$conversationId'
     | '/ai/'
     | '/teacher/'
     | '/ai/c/$conversationId'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/ai/sheets'
     | '/live/$sessionId'
     | '/teacher/availability'
+    | '/api/chat/$conversationId'
     | '/ai'
     | '/teacher'
     | '/ai/c/$conversationId'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ai/sheets'
     | '/_authenticated/live/$sessionId'
     | '/_authenticated/teacher/availability'
+    | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
     | '/_authenticated/ai/c/$conversationId'
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TeachersRoute: typeof TeachersRoute
   SessionsSessionIdRoute: typeof SessionsSessionIdRoute
+  ApiChatConversationIdRoute: typeof ApiChatConversationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -381,6 +394,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ai/'
       preLoaderRoute: typeof AuthenticatedAiIndexRouteImport
       parentRoute: typeof AuthenticatedAiRoute
+    }
+    '/api/chat/$conversationId': {
+      id: '/api/chat/$conversationId'
+      path: '/api/chat/$conversationId'
+      fullPath: '/api/chat/$conversationId'
+      preLoaderRoute: typeof ApiChatConversationIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/teacher/availability': {
       id: '/_authenticated/teacher/availability'
@@ -516,6 +536,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TeachersRoute: TeachersRoute,
   SessionsSessionIdRoute: SessionsSessionIdRoute,
+  ApiChatConversationIdRoute: ApiChatConversationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
