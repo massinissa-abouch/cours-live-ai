@@ -30,6 +30,7 @@ import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_au
 import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_authenticated/ai.sheets.$sheetId'
 import { Route as AuthenticatedAiExamNewRouteImport } from './routes/_authenticated/ai.exam.new'
 import { Route as AuthenticatedAiExamExamIdRouteImport } from './routes/_authenticated/ai.exam.$examId'
+import { Route as AuthenticatedAiCConversationIdRouteImport } from './routes/_authenticated/ai.c.$conversationId'
 
 const TeachersRoute = TeachersRouteImport.update({
   id: '/teachers',
@@ -141,6 +142,12 @@ const AuthenticatedAiExamExamIdRoute =
     path: '/exam/$examId',
     getParentRoute: () => AuthenticatedAiRoute,
   } as any)
+const AuthenticatedAiCConversationIdRoute =
+  AuthenticatedAiCConversationIdRouteImport.update({
+    id: '/c/$conversationId',
+    path: '/c/$conversationId',
+    getParentRoute: () => AuthenticatedAiRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
+  '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
@@ -180,6 +188,7 @@ export interface FileRoutesByTo {
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
+  '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
@@ -204,6 +213,7 @@ export interface FileRoutesById {
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
+  '/_authenticated/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/_authenticated/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/_authenticated/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/_authenticated/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/api/chat/$conversationId'
     | '/ai/'
     | '/teacher/'
+    | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
     | '/ai/sheets/$sheetId'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/api/chat/$conversationId'
     | '/ai'
     | '/teacher'
+    | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
     | '/ai/sheets/$sheetId'
@@ -272,6 +284,7 @@ export interface FileRouteTypes {
     | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
+    | '/_authenticated/ai/c/$conversationId'
     | '/_authenticated/ai/exam/$examId'
     | '/_authenticated/ai/exam/new'
     | '/_authenticated/ai/sheets/$sheetId'
@@ -438,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiExamExamIdRouteImport
       parentRoute: typeof AuthenticatedAiRoute
     }
+    '/_authenticated/ai/c/$conversationId': {
+      id: '/_authenticated/ai/c/$conversationId'
+      path: '/c/$conversationId'
+      fullPath: '/ai/c/$conversationId'
+      preLoaderRoute: typeof AuthenticatedAiCConversationIdRouteImport
+      parentRoute: typeof AuthenticatedAiRoute
+    }
   }
 }
 
@@ -457,6 +477,7 @@ const AuthenticatedAiSheetsRouteWithChildren =
 interface AuthenticatedAiRouteChildren {
   AuthenticatedAiSheetsRoute: typeof AuthenticatedAiSheetsRouteWithChildren
   AuthenticatedAiIndexRoute: typeof AuthenticatedAiIndexRoute
+  AuthenticatedAiCConversationIdRoute: typeof AuthenticatedAiCConversationIdRoute
   AuthenticatedAiExamExamIdRoute: typeof AuthenticatedAiExamExamIdRoute
   AuthenticatedAiExamNewRoute: typeof AuthenticatedAiExamNewRoute
 }
@@ -464,6 +485,7 @@ interface AuthenticatedAiRouteChildren {
 const AuthenticatedAiRouteChildren: AuthenticatedAiRouteChildren = {
   AuthenticatedAiSheetsRoute: AuthenticatedAiSheetsRouteWithChildren,
   AuthenticatedAiIndexRoute: AuthenticatedAiIndexRoute,
+  AuthenticatedAiCConversationIdRoute: AuthenticatedAiCConversationIdRoute,
   AuthenticatedAiExamExamIdRoute: AuthenticatedAiExamExamIdRoute,
   AuthenticatedAiExamNewRoute: AuthenticatedAiExamNewRoute,
 }
