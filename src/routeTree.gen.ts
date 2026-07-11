@@ -20,6 +20,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
+import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
 
@@ -78,6 +79,11 @@ const AuthenticatedTeacherIndexRoute =
     path: '/teacher/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAiIndexRoute = AuthenticatedAiIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAiRoute,
+} as any)
 const AuthenticatedTeacherAvailabilityRoute =
   AuthenticatedTeacherAvailabilityRouteImport.update({
     id: '/teacher/availability',
@@ -97,11 +103,12 @@ export interface FileRoutesByFullPath {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
-  '/ai': typeof AuthenticatedAiRoute
+  '/ai': typeof AuthenticatedAiRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
@@ -111,11 +118,11 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
-  '/ai': typeof AuthenticatedAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
@@ -127,11 +134,12 @@ export interface FileRoutesById {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
-  '/_authenticated/ai': typeof AuthenticatedAiRoute
+  '/_authenticated/ai': typeof AuthenticatedAiRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
@@ -148,6 +156,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/courses/$courseId'
     | '/teacher/availability'
+    | '/ai/'
     | '/teacher/'
     | '/teacher/courses/new'
   fileRoutesByTo: FileRoutesByTo
@@ -157,11 +166,11 @@ export interface FileRouteTypes {
     | '/courses'
     | '/sitemap.xml'
     | '/teachers'
-    | '/ai'
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
     | '/teacher/availability'
+    | '/ai'
     | '/teacher'
     | '/teacher/courses/new'
   id:
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
     | '/_authenticated/teacher/availability'
+    | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
     | '/_authenticated/teacher/courses/new'
   fileRoutesById: FileRoutesById
@@ -269,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeacherIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ai/': {
+      id: '/_authenticated/ai/'
+      path: '/'
+      fullPath: '/ai/'
+      preLoaderRoute: typeof AuthenticatedAiIndexRouteImport
+      parentRoute: typeof AuthenticatedAiRoute
+    }
     '/_authenticated/teacher/availability': {
       id: '/_authenticated/teacher/availability'
       path: '/teacher/availability'
@@ -286,8 +303,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAiRouteChildren {
+  AuthenticatedAiIndexRoute: typeof AuthenticatedAiIndexRoute
+}
+
+const AuthenticatedAiRouteChildren: AuthenticatedAiRouteChildren = {
+  AuthenticatedAiIndexRoute: AuthenticatedAiIndexRoute,
+}
+
+const AuthenticatedAiRouteWithChildren = AuthenticatedAiRoute._addFileChildren(
+  AuthenticatedAiRouteChildren,
+)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAiRoute: typeof AuthenticatedAiRoute
+  AuthenticatedAiRoute: typeof AuthenticatedAiRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
@@ -296,7 +325,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAiRoute: AuthenticatedAiRoute,
+  AuthenticatedAiRoute: AuthenticatedAiRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
