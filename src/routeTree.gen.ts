@@ -15,6 +15,7 @@ import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SessionsSessionIdRouteImport } from './routes/sessions.$sessionId'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -56,6 +57,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessionsSessionIdRoute = SessionsSessionIdRouteImport.update({
+  id: '/sessions/$sessionId',
+  path: '/sessions/$sessionId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/ai': typeof AuthenticatedAiIndexRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
+    | '/sessions/$sessionId'
     | '/ai/sheets'
     | '/teacher/availability'
     | '/ai/'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/courses/$courseId'
+    | '/sessions/$sessionId'
     | '/ai/sheets'
     | '/teacher/availability'
     | '/ai'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
+    | '/sessions/$sessionId'
     | '/_authenticated/ai/sheets'
     | '/_authenticated/teacher/availability'
     | '/_authenticated/ai/'
@@ -259,6 +271,7 @@ export interface RootRouteChildren {
   CoursesRoute: typeof CoursesRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TeachersRoute: typeof TeachersRoute
+  SessionsSessionIdRoute: typeof SessionsSessionIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sessions/$sessionId': {
+      id: '/sessions/$sessionId'
+      path: '/sessions/$sessionId'
+      fullPath: '/sessions/$sessionId'
+      preLoaderRoute: typeof SessionsSessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/courses/$courseId': {
@@ -471,6 +491,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesRoute: CoursesRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TeachersRoute: TeachersRoute,
+  SessionsSessionIdRoute: SessionsSessionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
