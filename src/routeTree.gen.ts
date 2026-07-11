@@ -24,6 +24,7 @@ import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
 import { Route as AuthenticatedAiExamNewRouteImport } from './routes/_authenticated/ai.exam.new'
+import { Route as AuthenticatedAiExamRouteImport } from './routes/_authenticated/ai.exam.'
 import { Route as AuthenticatedAiCRouteImport } from './routes/_authenticated/ai.c.'
 
 const TeachersRoute = TeachersRouteImport.update({
@@ -103,6 +104,11 @@ const AuthenticatedAiExamNewRoute = AuthenticatedAiExamNewRouteImport.update({
   path: '/exam/new',
   getParentRoute: () => AuthenticatedAiRoute,
 } as any)
+const AuthenticatedAiExamRoute = AuthenticatedAiExamRouteImport.update({
+  id: '/exam/',
+  path: '/exam/',
+  getParentRoute: () => AuthenticatedAiRoute,
+} as any)
 const AuthenticatedAiCRoute = AuthenticatedAiCRouteImport.update({
   id: '/c/',
   path: '/c/',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/ai/c/': typeof AuthenticatedAiCRoute
+  '/ai/exam/': typeof AuthenticatedAiExamRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/ai/c': typeof AuthenticatedAiCRoute
+  '/ai/exam': typeof AuthenticatedAiExamRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/ai/c/': typeof AuthenticatedAiCRoute
+  '/_authenticated/ai/exam/': typeof AuthenticatedAiExamRoute
   '/_authenticated/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
 }
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/ai/'
     | '/teacher/'
     | '/ai/c/'
+    | '/ai/exam/'
     | '/ai/exam/new'
     | '/teacher/courses/new'
   fileRoutesByTo: FileRoutesByTo
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/ai'
     | '/teacher'
     | '/ai/c'
+    | '/ai/exam'
     | '/ai/exam/new'
     | '/teacher/courses/new'
   id:
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
     | '/_authenticated/ai/c/'
+    | '/_authenticated/ai/exam/'
     | '/_authenticated/ai/exam/new'
     | '/_authenticated/teacher/courses/new'
   fileRoutesById: FileRoutesById
@@ -331,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiExamNewRouteImport
       parentRoute: typeof AuthenticatedAiRoute
     }
+    '/_authenticated/ai/exam/': {
+      id: '/_authenticated/ai/exam/'
+      path: '/exam'
+      fullPath: '/ai/exam/'
+      preLoaderRoute: typeof AuthenticatedAiExamRouteImport
+      parentRoute: typeof AuthenticatedAiRoute
+    }
     '/_authenticated/ai/c/': {
       id: '/_authenticated/ai/c/'
       path: '/c'
@@ -344,12 +363,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAiRouteChildren {
   AuthenticatedAiIndexRoute: typeof AuthenticatedAiIndexRoute
   AuthenticatedAiCRoute: typeof AuthenticatedAiCRoute
+  AuthenticatedAiExamRoute: typeof AuthenticatedAiExamRoute
   AuthenticatedAiExamNewRoute: typeof AuthenticatedAiExamNewRoute
 }
 
 const AuthenticatedAiRouteChildren: AuthenticatedAiRouteChildren = {
   AuthenticatedAiIndexRoute: AuthenticatedAiIndexRoute,
   AuthenticatedAiCRoute: AuthenticatedAiCRoute,
+  AuthenticatedAiExamRoute: AuthenticatedAiExamRoute,
   AuthenticatedAiExamNewRoute: AuthenticatedAiExamNewRoute,
 }
 
