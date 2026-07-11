@@ -14,6 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_conversations: {
+        Row: {
+          chapter: string | null
+          created_at: string
+          id: string
+          level: string | null
+          mode: Database["public"]["Enums"]["ai_conversation_mode"]
+          student_id: string
+          subject: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chapter?: string | null
+          created_at?: string
+          id?: string
+          level?: string | null
+          mode?: Database["public"]["Enums"]["ai_conversation_mode"]
+          student_id: string
+          subject?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          chapter?: string | null
+          created_at?: string
+          id?: string
+          level?: string | null
+          mode?: Database["public"]["Enums"]["ai_conversation_mode"]
+          student_id?: string
+          subject?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_exams: {
+        Row: {
+          answers: Json | null
+          chapter: string | null
+          created_at: string
+          duration_min: number
+          finished_at: string | null
+          grading: Json | null
+          id: string
+          level: string | null
+          questions: Json
+          score: number | null
+          started_at: string
+          student_id: string
+          subject: string
+        }
+        Insert: {
+          answers?: Json | null
+          chapter?: string | null
+          created_at?: string
+          duration_min?: number
+          finished_at?: string | null
+          grading?: Json | null
+          id?: string
+          level?: string | null
+          questions: Json
+          score?: number | null
+          started_at?: string
+          student_id: string
+          subject: string
+        }
+        Update: {
+          answers?: Json | null
+          chapter?: string | null
+          created_at?: string
+          duration_min?: number
+          finished_at?: string | null
+          grading?: Json | null
+          id?: string
+          level?: string | null
+          questions?: Json
+          score?: number | null
+          started_at?: string
+          student_id?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       ai_exercises: {
         Row: {
           created_at: string
@@ -50,6 +134,47 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          hint_level: number | null
+          id: string
+          image_url: string | null
+          parts: Json | null
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          hint_level?: number | null
+          id?: string
+          image_url?: string | null
+          parts?: Json | null
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          hint_level?: number | null
+          id?: string
+          image_url?: string | null
+          parts?: Json | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_quizzes: {
         Row: {
           chapter: string | null
@@ -85,6 +210,47 @@ export type Database = {
           subject?: string
         }
         Relationships: []
+      }
+      ai_revision_sheets: {
+        Row: {
+          chapter: string | null
+          content_markdown: string
+          conversation_id: string | null
+          created_at: string
+          id: string
+          student_id: string
+          subject: string | null
+          title: string
+        }
+        Insert: {
+          chapter?: string | null
+          content_markdown: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          student_id: string
+          subject?: string | null
+          title: string
+        }
+        Update: {
+          chapter?: string | null
+          content_markdown?: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          student_id?: string
+          subject?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_revision_sheets_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_submissions: {
         Row: {
@@ -667,6 +833,8 @@ export type Database = {
           created_at: string
           id: string
           joined_at: string | null
+          left_at: string | null
+          mode: string
           payment_id: string | null
           session_id: string
           status: Database["public"]["Enums"]["booking_status"]
@@ -676,6 +844,8 @@ export type Database = {
           created_at?: string
           id?: string
           joined_at?: string | null
+          left_at?: string | null
+          mode?: string
           payment_id?: string | null
           session_id: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -685,6 +855,8 @@ export type Database = {
           created_at?: string
           id?: string
           joined_at?: string | null
+          left_at?: string | null
+          mode?: string
           payment_id?: string | null
           session_id?: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -702,6 +874,7 @@ export type Database = {
       }
       session_quizzes: {
         Row: {
+          closed_at: string | null
           correct_answer: string
           id: string
           options: Json
@@ -710,6 +883,7 @@ export type Database = {
           session_id: string
         }
         Insert: {
+          closed_at?: string | null
           correct_answer: string
           id?: string
           options: Json
@@ -718,6 +892,7 @@ export type Database = {
           session_id: string
         }
         Update: {
+          closed_at?: string | null
           correct_answer?: string
           id?: string
           options?: Json
@@ -766,6 +941,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "session_reviews_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_summaries: {
+        Row: {
+          created_at: string
+          id: string
+          per_student: Json
+          session_id: string
+          stats: Json
+          summary_markdown: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          per_student?: Json
+          session_id: string
+          stats?: Json
+          summary_markdown: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          per_student?: Json
+          session_id?: string
+          stats?: Json
+          summary_markdown?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_summaries_session_id_fkey"
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "live_sessions"
@@ -994,6 +1204,7 @@ export type Database = {
       }
     }
     Enums: {
+      ai_conversation_mode: "chat" | "exam"
       ai_source_type: "generated" | "from_photo" | "from_text"
       app_role: "student" | "teacher" | "parent" | "admin"
       booking_status: "booked" | "attended" | "no_show" | "cancelled"
@@ -1159,6 +1370,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ai_conversation_mode: ["chat", "exam"],
       ai_source_type: ["generated", "from_photo", "from_text"],
       app_role: ["student", "teacher", "parent", "admin"],
       booking_status: ["booked", "attended", "no_show", "cancelled"],
