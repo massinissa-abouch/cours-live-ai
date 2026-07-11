@@ -23,6 +23,7 @@ import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
+import { Route as AuthenticatedLiveSessionIdRouteImport } from './routes/_authenticated/live.$sessionId'
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
 import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_authenticated/ai.sheets.$sheetId'
@@ -101,6 +102,12 @@ const AuthenticatedTeacherAvailabilityRoute =
     path: '/teacher/availability',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLiveSessionIdRoute =
+  AuthenticatedLiveSessionIdRouteImport.update({
+    id: '/live/$sessionId',
+    path: '/live/$sessionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAiSheetsRoute = AuthenticatedAiSheetsRouteImport.update({
   id: '/sheets',
   path: '/sheets',
@@ -146,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
@@ -166,6 +174,7 @@ export interface FileRoutesByTo {
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
@@ -189,6 +198,7 @@ export interface FileRoutesById {
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/_authenticated/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/courses/$courseId'
     | '/sessions/$sessionId'
     | '/ai/sheets'
+    | '/live/$sessionId'
     | '/teacher/availability'
     | '/ai/'
     | '/teacher/'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/courses/$courseId'
     | '/sessions/$sessionId'
     | '/ai/sheets'
+    | '/live/$sessionId'
     | '/teacher/availability'
     | '/ai'
     | '/teacher'
@@ -254,6 +266,7 @@ export interface FileRouteTypes {
     | '/courses/$courseId'
     | '/sessions/$sessionId'
     | '/_authenticated/ai/sheets'
+    | '/_authenticated/live/$sessionId'
     | '/_authenticated/teacher/availability'
     | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
@@ -374,6 +387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeacherAvailabilityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/live/$sessionId': {
+      id: '/_authenticated/live/$sessionId'
+      path: '/live/$sessionId'
+      fullPath: '/live/$sessionId'
+      preLoaderRoute: typeof AuthenticatedLiveSessionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ai/sheets': {
       id: '/_authenticated/ai/sheets'
       path: '/sheets'
@@ -456,6 +476,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiRoute: typeof AuthenticatedAiRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedLiveSessionIdRoute: typeof AuthenticatedLiveSessionIdRoute
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedTeacherCoursesNewRoute: typeof AuthenticatedTeacherCoursesNewRoute
@@ -465,6 +486,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiRoute: AuthenticatedAiRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedLiveSessionIdRoute: AuthenticatedLiveSessionIdRoute,
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
   AuthenticatedTeacherCoursesNewRoute: AuthenticatedTeacherCoursesNewRoute,
