@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/teacher/")({
   component: TeacherHome,
@@ -54,6 +54,19 @@ function TeacherHome() {
             <Plus className="h-4 w-4" /> Nouveau cours
           </Link>
         </div>
+        <Link to="/teacher/availability"
+          className="mt-6 flex items-center justify-between rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:bg-primary/5">
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/30">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="font-semibold">Mes créneaux de disponibilité</div>
+              <div className="text-sm text-muted-foreground">Définis quand tu es dispo pour du tutorat en direct.</div>
+            </div>
+          </div>
+          <span className="text-primary">→</span>
+        </Link>
         <div className="mt-8">
           {loading ? (
             <p className="text-sm text-muted-foreground">Chargement…</p>
