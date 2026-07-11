@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ArrowLeft, PlayCircle, Lock } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, PlayCircle, Lock, Star, Users, Clock, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/courses/$courseId")({
@@ -14,6 +14,7 @@ type Course = {
   rating_avg: number; enrolled_count: number;
 };
 type Video = { id: string; title: string; is_free_preview: boolean; video_url: string; order_index: number };
+type Review = { id: string; rating: number; comment: string | null; created_at: string; student_id: string };
 
 function CourseDetail() {
   const { courseId } = Route.useParams();
@@ -21,6 +22,10 @@ function CourseDetail() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
   const [enrolled, setEnrolled] = useState(false);
+  const [teacherName, setTeacherName] = useState<string>("");
+  const [teacherAvatar, setTeacherAvatar] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [activeChapter, setActiveChapter] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -39,6 +44,14 @@ function CourseDetail() {
       setVideos(v ?? []);
       const { data: sig } = await supabase.storage.from("course-media").createSignedUrl(c.trailer_video_url, 3600);
       setTrailerUrl(sig?.signedUrl ?? null);
+      const { data: prof } = await supabase.from("profiles")
+        .select("full_name,avatar_url").eq("id", c.teacher_id).maybeSingle();
+      setTeacherName(prof?.full_name ?? "Professeur");
+      setTeacherAvatar(prof?.avatar_url ?? null);
+      const { data: rvs } = await supabase.from("course_reviews")
+        .select("id,rating,comment,created_at,student_id").eq("course_id", courseId)
+        .order("created_at", { ascending: false }).limit(6);
+      setReviews(rvs ?? []);
       const { data: user } = await supabase.auth.getUser();
       if (user.user) {
         const { data: e } = await supabase.from("course_enrollments")
@@ -48,66 +61,206 @@ function CourseDetail() {
     })();
   }, [courseId]);
 
-  if (!course) return <div className="p-10 text-center text-sm text-muted-foreground">Chargement…</div>;
+  const stats = useMemo(() => ({
+    duration: videos.length * 12,
+    chapters: videos.length,
+  }), [videos]);
+
+  if (!course) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background">
+        <div className="text-sm text-muted-foreground">Chargement…</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="mx-auto flex h-16 max-w-5xl items-center px-4">
-          <Link to="/courses" className="flex items-center gap-2 text-sm hover:text-primary">
-            <ArrowLeft className="h-4 w-4" /> Catalogue
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.18),transparent_60%)]" />
+
+      <header className="relative z-10 border-b border-border/60 bg-background/60 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-6xl items-center px-4">
+          <Link to="/courses" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" /> Marketplace
           </Link>
         </div>
       </header>
-      <main className="mx-auto grid max-w-5xl gap-8 px-4 py-10 md:grid-cols-3">
-        <div className="md:col-span-2 space-y-6">
-          <div className="aspect-video overflow-hidden rounded-2xl bg-black">
-            {trailerUrl ? (
-              <video src={trailerUrl} controls className="h-full w-full" />
-            ) : (
-              <div className="grid h-full place-items-center text-white/50">Chargement du trailer…</div>
+
+      <main className="relative z-10 mx-auto max-w-6xl px-4 py-10">
+        {/* Hero */}
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="relative aspect-video overflow-hidden rounded-3xl border border-border/60 bg-black shadow-[0_30px_80px_-30px_hsl(var(--primary)/0.5)]">
+              {trailerUrl ? (
+                <video src={trailerUrl} controls className="h-full w-full" />
+              ) : (
+                <div className="grid h-full place-items-center text-white/40">Chargement du trailer…</div>
+              )}
+            </div>
+
+            <div>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 font-medium text-primary">
+                  {course.subject}
+                </span>
+                <span className="rounded-full border border-border/60 bg-card/50 px-2.5 py-1 uppercase tracking-wide text-muted-foreground">
+                  {course.level.replace(/_/g, " ")}
+                </span>
+                {course.rating_avg >= 4.5 && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 font-medium text-amber-300">
+                    <Sparkles className="h-3 w-3" /> Coup de cœur
+                  </span>
+                )}
+              </div>
+              <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{course.title}</h1>
+              <p className="mt-3 text-muted-foreground leading-relaxed">{course.description}</p>
+
+              <div className="mt-5 flex flex-wrap items-center gap-5 text-sm">
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  <b className="text-foreground">{course.rating_avg.toFixed(1)}</b> ({reviews.length} avis)
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <Users className="h-4 w-4" /> {course.enrolled_count} inscrits
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <Clock className="h-4 w-4" /> ~{stats.duration} min
+                </span>
+              </div>
+
+              {/* Teacher card */}
+              <div className="mt-5 flex items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-3 backdrop-blur">
+                <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-full bg-primary/15 text-primary font-semibold">
+                  {teacherAvatar ? <img src={teacherAvatar} alt={teacherName} className="h-full w-full object-cover" /> : teacherName.charAt(0)}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold">{teacherName}</div>
+                  <div className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                    <ShieldCheck className="h-3 w-3 text-emerald-400" /> Prof vérifié
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Chapter timeline */}
+            <section>
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Programme du cours</h2>
+                <span className="text-xs text-muted-foreground">{stats.chapters} chapitre{stats.chapters > 1 ? "s" : ""}</span>
+              </div>
+              <div className="mt-4 overflow-hidden rounded-3xl border border-border/60 bg-card/40 backdrop-blur">
+                {videos.length === 0 && (
+                  <div className="p-6 text-sm text-muted-foreground">Le prof n'a pas encore ajouté de vidéos.</div>
+                )}
+                {videos.map((v, i) => {
+                  const unlocked = enrolled || v.is_free_preview;
+                  const active = activeChapter === i;
+                  return (
+                    <button
+                      key={v.id}
+                      onClick={() => setActiveChapter(i)}
+                      className={`group flex w-full items-center gap-4 border-t border-border/50 p-4 text-left transition first:border-t-0 hover:bg-primary/5 ${active ? "bg-primary/5" : ""}`}
+                    >
+                      <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-semibold transition ${
+                        unlocked ? "bg-primary/15 text-primary" : "bg-secondary/60 text-muted-foreground"
+                      }`}>
+                        {String(i + 1).padStart(2, "0")}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium">{v.title}</div>
+                        <div className="mt-0.5 flex items-center gap-3 text-[11px] text-muted-foreground">
+                          <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> ~12 min</span>
+                          {v.is_free_preview && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-300">
+                              Preview gratuit
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {unlocked ? (
+                        <PlayCircle className="h-5 w-5 text-primary transition group-hover:scale-110" />
+                      ) : (
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* What you'll learn */}
+            <section className="rounded-3xl border border-border/60 bg-card/40 p-6 backdrop-blur">
+              <h2 className="text-xl font-semibold">Ce que tu vas apprendre</h2>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {[
+                  "Maîtriser les concepts clés du programme",
+                  "Techniques de résolution rapide",
+                  "Erreurs classiques à éviter",
+                  "Méthode pour l'examen officiel",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                    <span className="text-muted-foreground">{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* Reviews */}
+            {reviews.length > 0 && (
+              <section>
+                <h2 className="text-xl font-semibold">Avis des élèves</h2>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  {reviews.map((r) => (
+                    <div key={r.id} className="rounded-2xl border border-border/60 bg-card/40 p-4 backdrop-blur">
+                      <div className="flex items-center gap-1 text-amber-400">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star key={n} className={`h-3.5 w-3.5 ${n <= r.rating ? "fill-current" : "text-muted-foreground/30"}`} />
+                        ))}
+                      </div>
+                      {r.comment && <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{r.comment}</p>}
+                      <div className="mt-2 text-[11px] text-muted-foreground/70">
+                        {new Date(r.created_at).toLocaleDateString("fr-FR")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
             )}
           </div>
-          <div>
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">{course.subject}</div>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight">{course.title}</h1>
-            <p className="mt-3 text-muted-foreground">{course.description}</p>
-          </div>
-          <section>
-            <h2 className="text-xl font-semibold">Contenu du cours</h2>
-            <div className="mt-3 divide-y divide-border rounded-2xl border border-border bg-card">
-              {videos.length === 0 && (
-                <div className="p-5 text-sm text-muted-foreground">Le prof n'a pas encore ajouté de vidéos.</div>
-              )}
-              {videos.map((v, i) => (
-                <div key={v.id} className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground w-6">{i + 1}.</span>
-                    <span className="font-medium">{v.title}</span>
+
+          {/* Sticky pricing */}
+          <aside className="lg:sticky lg:top-6 h-fit space-y-4">
+            <div className="rounded-3xl border border-border/60 bg-card/60 p-6 shadow-[0_20px_60px_-20px_hsl(var(--primary)/0.35)] backdrop-blur-xl">
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold tracking-tight">{course.price}</span>
+                <span className="text-sm text-muted-foreground">DZD</span>
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">Accès à vie · Mises à jour incluses</div>
+
+              <button
+                disabled={enrolled}
+                className="mt-5 w-full rounded-2xl bg-gradient-to-r from-primary to-primary/80 px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_hsl(var(--primary)/0.7)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {enrolled ? "Déjà inscrit ✓" : "S'inscrire au cours"}
+              </button>
+              <div className="mt-2 text-center text-[11px] text-muted-foreground">Paiement sécurisé · Bientôt disponible</div>
+
+              <div className="mt-6 space-y-3 text-sm">
+                {[
+                  { icon: PlayCircle, text: `${stats.chapters} vidéos HD` },
+                  { icon: Clock, text: `~${stats.duration} min de contenu` },
+                  { icon: ShieldCheck, text: "Prof vérifié" },
+                  { icon: Sparkles, text: "Quiz IA inclus" },
+                ].map((f) => (
+                  <div key={f.text} className="flex items-center gap-2 text-muted-foreground">
+                    <f.icon className="h-4 w-4 text-primary" /> {f.text}
                   </div>
-                  {enrolled || v.is_free_preview ? (
-                    <PlayCircle className="h-5 w-5 text-primary" />
-                  ) : (
-                    <Lock className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </section>
+          </aside>
         </div>
-        <aside className="md:sticky md:top-6 h-fit rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
-          <div className="text-3xl font-bold">{course.price} <span className="text-base text-muted-foreground">DZD</span></div>
-          <button
-            disabled={enrolled}
-            className="mt-4 w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90 disabled:opacity-60">
-            {enrolled ? "Déjà inscrit" : "S'inscrire (paiement bientôt)"}
-          </button>
-          <div className="mt-4 space-y-1 text-sm text-muted-foreground">
-            <div>⭐ {course.rating_avg.toFixed(1)} · {course.enrolled_count} inscrits</div>
-            <div>🎬 {videos.length} vidéo{videos.length > 1 ? "s" : ""}</div>
-            <div>🇩🇿 Programme algérien</div>
-          </div>
-        </aside>
       </main>
     </div>
   );
