@@ -158,6 +158,42 @@ function TeacherAvailability() {
             ))
           )}
         </div>
+
+        <section className="mt-10 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+            <Video className="h-4 w-4" /> Publier une session live réservable
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Les élèves verront cette session dans « Trouver un prof » et pourront la réserver.
+          </p>
+          <form onSubmit={addSession} className="mt-4 grid gap-3 sm:grid-cols-2">
+            <input value={ssTitle} onChange={(e) => setSsTitle(e.target.value)} placeholder="Titre (optionnel)"
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+            <input required value={ssSubject} onChange={(e) => setSsSubject(e.target.value)} placeholder="Matière"
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+            <input required type="date" value={ssDate} onChange={(e) => setSsDate(e.target.value)}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+            <input required type="time" value={ssTime} onChange={(e) => setSsTime(e.target.value)}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+            <input required type="number" min={15} max={240} value={ssDur} onChange={(e) => setSsDur(Number(e.target.value))}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="Durée (min)" />
+            <select value={ssType} onChange={(e) => setSsType(e.target.value as "solo"|"group")}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm">
+              <option value="solo">Solo (1 élève)</option>
+              <option value="group">Groupe (jusqu'à 5)</option>
+            </select>
+            {ssType === "group" && (
+              <input type="number" min={2} max={5} value={ssMax} onChange={(e) => setSsMax(Number(e.target.value))}
+                className="rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="Places max" />
+            )}
+            <input required type="number" min={0} value={ssPrice} onChange={(e) => setSsPrice(Number(e.target.value))}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="Prix / élève (DZD)" />
+            <button type="submit" disabled={ssBusy}
+              className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+              <Plus className="h-4 w-4" /> {ssBusy ? "Publication…" : "Publier la session"}
+            </button>
+          </form>
+        </section>
       </main>
     </div>
   );
