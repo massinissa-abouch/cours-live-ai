@@ -147,18 +147,44 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
         });
 
         const gateway = createLovableAiGatewayProvider(lovableKey);
-        const model = gateway("google/gemini-3-flash-preview");
+        // Hybrid routing: fast/cheap model for hint level 1 & short chat turns,
+        // powerful reasoning model for detailed explanations, corrections, harder mode.
+        const isShort = body.content.trim().length < 200 && !body.image_url;
+        const useFast =
+          (body.mode === "hint" && (body.hintLevel ?? 1) === 1) ||
+          (body.mode === "chat" && isShort);
+        const modelId = useFast ? "google/gemini-3.5-flash" : "openai/gpt-5";
+        // Approximate EUR pricing per 1M tokens (input / output). Adjust here to refine cost tracking.
+        const PRICING: Record<string, { in: number; out: number }> = {
+          "google/gemini-3.5-flash": { in: 0.28, out: 2.3 },
+          "openai/gpt-5": { in: 1.15, out: 9.2 },
+        };
+        const model = gateway(modelId);
 
         const result = streamText({
           model,
           system: systemPrompt(conv.subject, conv.level, conv.chapter, body.mode, body.hintLevel),
           messages,
-          onFinish: async ({ text }) => {
+          onFinish: async ({ text, usage }) => {
             await supabase.from("ai_messages").insert({
               conversation_id: conv.id,
               role: "assistant",
               content: text,
               hint_level: body.mode === "hint" ? (body.hintLevel ?? null) : null,
+            });
+            // Cost tracking
+            const inTok = usage?.inputTokens ?? 0;
+            const outTok = usage?.outputTokens ?? 0;
+            const p = PRICING[modelId] ?? { in: 0, out: 0 };
+            const cost = (inTok * p.in + outTok * p.out) / 1_000_000;
+            await supabase.from("ai_usage").insert({
+              user_id: userId,
+              conversation_id: conv.id,
+              model: modelId,
+              mode: body.mode,
+              input_tokens: inTok,
+              output_tokens: outTok,
+              cost_eur: cost,
             });
             const wasFirst = !(history ?? []).length;
             if (wasFirst) {
