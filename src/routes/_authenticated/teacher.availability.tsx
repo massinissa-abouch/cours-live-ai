@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Trash2, Plus, Clock } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Clock, Video } from "lucide-react";
 import { toast } from "sonner";
+import { createSessionSlot } from "@/lib/live-session.functions";
 
 export const Route = createFileRoute("/_authenticated/teacher/availability")({
   component: TeacherAvailability,
@@ -20,6 +22,38 @@ function TeacherAvailability() {
   const [end, setEnd] = useState("18:00");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const createSlot = useServerFn(createSessionSlot);
+  const [ssTitle, setSsTitle] = useState("");
+  const [ssSubject, setSsSubject] = useState("");
+  const [ssDate, setSsDate] = useState("");
+  const [ssTime, setSsTime] = useState("17:00");
+  const [ssDur, setSsDur] = useState(60);
+  const [ssType, setSsType] = useState<"solo" | "group">("solo");
+  const [ssMax, setSsMax] = useState(3);
+  const [ssPrice, setSsPrice] = useState(1500);
+  const [ssBusy, setSsBusy] = useState(false);
+
+  async function addSession(e: React.FormEvent) {
+    e.preventDefault();
+    if (!ssDate) { toast.error("Date obligatoire"); return; }
+    setSsBusy(true);
+    try {
+      await createSlot({ data: {
+        title: ssTitle || undefined,
+        subject: ssSubject,
+        level: "lycee_3_sciences",
+        scheduledAt: new Date(`${ssDate}T${ssTime}`).toISOString(),
+        durationMin: ssDur,
+        sessionType: ssType,
+        maxStudents: ssMax,
+        pricePerStudent: ssPrice,
+      }});
+      toast.success("Session publiée ✓");
+      setSsTitle(""); setSsSubject(""); setSsDate("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally { setSsBusy(false); }
+  }
 
   async function reload() {
     const { data } = await supabase
@@ -124,6 +158,42 @@ function TeacherAvailability() {
             ))
           )}
         </div>
+
+        <section className="mt-10 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+            <Video className="h-4 w-4" /> Publier une session live réservable
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Les élèves verront cette session dans « Trouver un prof » et pourront la réserver.
+          </p>
+          <form onSubmit={addSession} className="mt-4 grid gap-3 sm:grid-cols-2">
+            <input value={ssTitle} onChange={(e) => setSsTitle(e.target.value)} placeholder="Titre (optionnel)"
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+            <input required value={ssSubject} onChange={(e) => setSsSubject(e.target.value)} placeholder="Matière"
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+            <input required type="date" value={ssDate} onChange={(e) => setSsDate(e.target.value)}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+            <input required type="time" value={ssTime} onChange={(e) => setSsTime(e.target.value)}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" />
+            <input required type="number" min={15} max={240} value={ssDur} onChange={(e) => setSsDur(Number(e.target.value))}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="Durée (min)" />
+            <select value={ssType} onChange={(e) => setSsType(e.target.value as "solo"|"group")}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm">
+              <option value="solo">Solo (1 élève)</option>
+              <option value="group">Groupe (jusqu'à 5)</option>
+            </select>
+            {ssType === "group" && (
+              <input type="number" min={2} max={5} value={ssMax} onChange={(e) => setSsMax(Number(e.target.value))}
+                className="rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="Places max" />
+            )}
+            <input required type="number" min={0} value={ssPrice} onChange={(e) => setSsPrice(Number(e.target.value))}
+              className="rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="Prix / élève (DZD)" />
+            <button type="submit" disabled={ssBusy}
+              className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+              <Plus className="h-4 w-4" /> {ssBusy ? "Publication…" : "Publier la session"}
+            </button>
+          </form>
+        </section>
       </main>
     </div>
   );

@@ -78,9 +78,10 @@ function SessionDetail() {
   async function onBook() {
     setLoading(true);
     try {
-      await book({ data: { sessionId, mode } });
-      toast.success("Réservation enregistrée");
+      const res = await book({ data: { sessionId, mode } });
+      toast.success("Réservation enregistrée ✓");
       await refresh();
+      if (res.sessionId) navigate({ to: "/live/$sessionId", params: { sessionId: res.sessionId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erreur");
     } finally {
@@ -144,11 +145,11 @@ function SessionDetail() {
               </div>
             )}
 
-            {myBooking?.status === "confirmed" && session.status === "live" && (
+            {myBooking && (myBooking.status === "booked" || myBooking.status === "attended") && (
               <button
                 onClick={() => navigate({ to: "/live/$sessionId", params: { sessionId } })}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-4 py-3 text-sm font-bold text-primary-foreground animate-pulse">
-                <Video className="h-4 w-4" /> Rejoindre la session EN DIRECT
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-4 py-3 text-sm font-bold text-primary-foreground">
+                <Video className="h-4 w-4" /> Aller à la salle de session
               </button>
             )}
           </div>

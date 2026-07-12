@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Plus, Send, Loader2, StopCircle, CheckCircle2, XCircle, Users } from "lucide-react";
+import { ArrowLeft, Plus, Send, Loader2, StopCircle, CheckCircle2, XCircle, Users, Video } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,12 +12,13 @@ import {
   answerLiveQuiz,
   endSessionAndSummarize,
 } from "@/lib/live-session.functions";
+import { getOrCreateDailyRoom } from "@/lib/daily.functions";
 
 export const Route = createFileRoute("/_authenticated/live/$sessionId")({
   component: LiveRoom,
 });
 
-type Session = { id: string; title: string | null; subject: string; teacher_id: string; daily_room_url: string | null; status: string };
+type Session = { id: string; title: string | null; subject: string; teacher_id: string; daily_room_url: string | null; status: string; scheduled_at: string; duration_min: number };
 type Quiz = { id: string; question: string; options: string[]; correct_answer: string; sent_at: string; closed_at: string | null };
 type Response = { quiz_id: string; student_id: string; answer: string; is_correct: boolean };
 type Booking = { id: string; student_id: string; status: string; mode: string };
@@ -29,6 +30,7 @@ function LiveRoom() {
   const closeQ = useServerFn(closeLiveQuiz);
   const answerQ = useServerFn(answerLiveQuiz);
   const endSess = useServerFn(endSessionAndSummarize);
+  const joinRoom = useServerFn(getOrCreateDailyRoom);
 
   const [session, setSession] = useState<Session | null>(null);
   const [isTeacher, setIsTeacher] = useState(false);
@@ -38,6 +40,9 @@ function LiveRoom() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [summary, setSummary] = useState<string | null>(null);
   const [ending, setEnding] = useState(false);
+  const [joining, setJoining] = useState(false);
+  const [dailyUrl, setDailyUrl] = useState<string | null>(null);
+  const [now, setNow] = useState(Date.now());
 
   // teacher composer state
   const [question, setQuestion] = useState("");
@@ -49,6 +54,11 @@ function LiveRoom() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null));
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(t);
   }, []);
 
   async function refresh() {
@@ -82,6 +92,7 @@ function LiveRoom() {
       .eq("session_id", sessionId)
       .maybeSingle();
     setSummary(sum?.summary_markdown ?? null);
+    if ((res.session as Session).daily_room_url) setDailyUrl((res.session as Session).daily_room_url);
   }
 
   useEffect(() => {
@@ -165,7 +176,23 @@ function LiveRoom() {
 
   if (!session) return <div className="grid min-h-screen place-items-center bg-background"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
-  const dailyUrl = session.daily_room_url;
+  const start = new Date(session.scheduled_at).getTime();
+  const openAt = start - 15 * 60 * 1000;
+  const closeAt = start + (session.duration_min + 30) * 60 * 1000;
+  const canJoin = now >= openAt && now <= closeAt;
+  const minsUntilOpen = Math.max(0, Math.ceil((openAt - now) / 60_000));
+
+  async function handleJoin() {
+    setJoining(true);
+    try {
+      const res = await joinRoom({ data: { sessionId } });
+      setDailyUrl(res.url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur");
+    } finally {
+      setJoining(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -197,11 +224,22 @@ function LiveRoom() {
             {dailyUrl ? (
               <iframe src={dailyUrl} title="Visio" allow="camera; microphone; fullscreen; display-capture" className="h-full w-full" />
             ) : (
-              <div className="grid h-full place-items-center p-6 text-center text-white/60">
+              <div className="grid h-full place-items-center p-6 text-center text-white/70">
                 <div>
-                  <div className="text-4xl">📹</div>
-                  <div className="mt-3 text-sm">La visio n'est pas encore configurée pour cette session.</div>
-                  <div className="mt-1 text-[11px]">Le prof branchera Daily.co plus tard — le quiz temps réel fonctionne déjà.</div>
+                  <Video className="mx-auto h-10 w-10 opacity-80" />
+                  <div className="mt-3 text-sm">
+                    {canJoin
+                      ? "La salle est prête. Clique pour rejoindre."
+                      : `Ouverture dans ${minsUntilOpen} min (15 min avant le début).`}
+                  </div>
+                  <button
+                    onClick={handleJoin}
+                    disabled={!canJoin || joining}
+                    className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-40"
+                  >
+                    {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : <Video className="h-4 w-4" />}
+                    Rejoindre la visio
+                  </button>
                 </div>
               </div>
             )}

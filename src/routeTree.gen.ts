@@ -27,10 +27,12 @@ import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_
 import { Route as AuthenticatedLiveSessionIdRouteImport } from './routes/_authenticated/live.$sessionId'
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
+import { Route as AuthenticatedSessionsBookTeacherIdRouteImport } from './routes/_authenticated/sessions.book.$teacherId'
 import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_authenticated/ai.sheets.$sheetId'
 import { Route as AuthenticatedAiExamNewRouteImport } from './routes/_authenticated/ai.exam.new'
 import { Route as AuthenticatedAiExamExamIdRouteImport } from './routes/_authenticated/ai.exam.$examId'
 import { Route as AuthenticatedAiCConversationIdRouteImport } from './routes/_authenticated/ai.c.$conversationId'
+import { Route as AuthenticatedTeacherCoursesCourseIdChaptersRouteImport } from './routes/_authenticated/teacher.courses.$courseId.chapters'
 
 const TeachersRoute = TeachersRouteImport.update({
   id: '/teachers',
@@ -125,6 +127,12 @@ const AuthenticatedTeacherCoursesNewRoute =
     path: '/teacher/courses/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSessionsBookTeacherIdRoute =
+  AuthenticatedSessionsBookTeacherIdRouteImport.update({
+    id: '/sessions/book/$teacherId',
+    path: '/sessions/book/$teacherId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAiSheetsSheetIdRoute =
   AuthenticatedAiSheetsSheetIdRouteImport.update({
     id: '/$sheetId',
@@ -148,6 +156,12 @@ const AuthenticatedAiCConversationIdRoute =
     path: '/c/$conversationId',
     getParentRoute: () => AuthenticatedAiRoute,
   } as any)
+const AuthenticatedTeacherCoursesCourseIdChaptersRoute =
+  AuthenticatedTeacherCoursesCourseIdChaptersRouteImport.update({
+    id: '/teacher/courses/$courseId/chapters',
+    path: '/teacher/courses/$courseId/chapters',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -170,7 +184,9 @@ export interface FileRoutesByFullPath {
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
+  '/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -192,7 +208,9 @@ export interface FileRoutesByTo {
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
+  '/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -217,7 +235,9 @@ export interface FileRoutesById {
   '/_authenticated/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/_authenticated/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/_authenticated/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
+  '/_authenticated/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/_authenticated/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -242,7 +262,9 @@ export interface FileRouteTypes {
     | '/ai/exam/$examId'
     | '/ai/exam/new'
     | '/ai/sheets/$sheetId'
+    | '/sessions/book/$teacherId'
     | '/teacher/courses/new'
+    | '/teacher/courses/$courseId/chapters'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -264,7 +286,9 @@ export interface FileRouteTypes {
     | '/ai/exam/$examId'
     | '/ai/exam/new'
     | '/ai/sheets/$sheetId'
+    | '/sessions/book/$teacherId'
     | '/teacher/courses/new'
+    | '/teacher/courses/$courseId/chapters'
   id:
     | '__root__'
     | '/'
@@ -288,7 +312,9 @@ export interface FileRouteTypes {
     | '/_authenticated/ai/exam/$examId'
     | '/_authenticated/ai/exam/new'
     | '/_authenticated/ai/sheets/$sheetId'
+    | '/_authenticated/sessions/book/$teacherId'
     | '/_authenticated/teacher/courses/new'
+    | '/_authenticated/teacher/courses/$courseId/chapters'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -430,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeacherCoursesNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sessions/book/$teacherId': {
+      id: '/_authenticated/sessions/book/$teacherId'
+      path: '/sessions/book/$teacherId'
+      fullPath: '/sessions/book/$teacherId'
+      preLoaderRoute: typeof AuthenticatedSessionsBookTeacherIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ai/sheets/$sheetId': {
       id: '/_authenticated/ai/sheets/$sheetId'
       path: '/$sheetId'
@@ -457,6 +490,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ai/c/$conversationId'
       preLoaderRoute: typeof AuthenticatedAiCConversationIdRouteImport
       parentRoute: typeof AuthenticatedAiRoute
+    }
+    '/_authenticated/teacher/courses/$courseId/chapters': {
+      id: '/_authenticated/teacher/courses/$courseId/chapters'
+      path: '/teacher/courses/$courseId/chapters'
+      fullPath: '/teacher/courses/$courseId/chapters'
+      preLoaderRoute: typeof AuthenticatedTeacherCoursesCourseIdChaptersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
@@ -501,7 +541,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLiveSessionIdRoute: typeof AuthenticatedLiveSessionIdRoute
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
+  AuthenticatedSessionsBookTeacherIdRoute: typeof AuthenticatedSessionsBookTeacherIdRoute
   AuthenticatedTeacherCoursesNewRoute: typeof AuthenticatedTeacherCoursesNewRoute
+  AuthenticatedTeacherCoursesCourseIdChaptersRoute: typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -511,7 +553,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLiveSessionIdRoute: AuthenticatedLiveSessionIdRoute,
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
+  AuthenticatedSessionsBookTeacherIdRoute:
+    AuthenticatedSessionsBookTeacherIdRoute,
   AuthenticatedTeacherCoursesNewRoute: AuthenticatedTeacherCoursesNewRoute,
+  AuthenticatedTeacherCoursesCourseIdChaptersRoute:
+    AuthenticatedTeacherCoursesCourseIdChaptersRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

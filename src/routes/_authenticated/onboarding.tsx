@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { GraduationCap, Users, Sparkles } from "lucide-react";
+import { GraduationCap, Users, Sparkles, Upload, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
@@ -49,18 +49,24 @@ function Onboarding() {
   const [exam, setExam] = useState<"none" | "bem" | "bac">("bac");
   const [wilaya, setWilaya] = useState("");
   const [saving, setSaving] = useState(false);
+  const [subjects, setSubjects] = useState("");
+  const [hourlyRate, setHourlyRate] = useState(1500);
+  const [idDoc, setIdDoc] = useState<File | null>(null);
+  const [diploma, setDiploma] = useState<File | null>(null);
 
   useEffect(() => {
-    // If already onboarded (student with level or teacher with subjects), skip
     (async () => {
-      const { data } = await supabase
-        .from("student_profiles")
-        .select("school_level")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (data?.school_level) navigate({ to: "/dashboard" });
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
+      if ((roles ?? []).some((r) => r.role === "teacher")) setRole("teacher");
     })();
-  }, [user.id, navigate]);
+  }, [user.id]);
+
+  async function uploadDoc(file: File, kind: string) {
+    const path = `${user.id}/${kind}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+    const { error } = await supabase.storage.from("teacher-docs").upload(path, file, { upsert: true });
+    if (error) throw error;
+    return path;
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -68,7 +74,7 @@ function Onboarding() {
     try {
       // Ensure role
       if (role !== "student") {
-        await supabase.from("user_roles").insert({ user_id: user.id, role });
+        await supabase.from("user_roles").upsert({ user_id: user.id, role }, { onConflict: "user_id,role" });
       }
       // Save wilaya
       if (wilaya) {
@@ -80,9 +86,19 @@ function Onboarding() {
         .upsert({ user_id: user.id, school_level: level, exam_target: exam });
 
       if (role === "teacher") {
+        const idPath = idDoc ? await uploadDoc(idDoc, "id") : undefined;
+        const diplomaPath = diploma ? await uploadDoc(diploma, "diploma") : undefined;
         await supabase
           .from("teacher_profiles")
-          .upsert({ user_id: user.id, subjects: [], levels: [level] });
+          .upsert({
+            user_id: user.id,
+            subjects: subjects.split(",").map((s) => s.trim()).filter(Boolean),
+            levels: [level],
+            hourly_rate: hourlyRate,
+            id_document_url: idPath ?? null,
+            diploma_url: diplomaPath ?? null,
+            verification_status: "pending",
+          });
         navigate({ to: "/teacher" });
       } else {
         navigate({ to: "/dashboard" });
@@ -152,6 +168,34 @@ function Onboarding() {
               className="mt-3 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm" />
           </section>
 
+          {role === "teacher" && (
+            <>
+              <section>
+                <label className="text-sm font-semibold">Matières enseignées</label>
+                <input value={subjects} onChange={(e) => setSubjects(e.target.value)}
+                  placeholder="Ex: Mathématiques, Physique, SVT (séparées par des virgules)"
+                  className="mt-3 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm" />
+              </section>
+              <section>
+                <label className="text-sm font-semibold">Tarif horaire (DZD)</label>
+                <input type="number" min={0} value={hourlyRate} onChange={(e) => setHourlyRate(Number(e.target.value))}
+                  className="mt-3 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm" />
+              </section>
+              <section className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+                <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                  <ShieldCheck className="h-4 w-4" /> Vérification prof (nécessaire pour le badge « vérifié »)
+                </div>
+                <div className="mt-3 space-y-2">
+                  <DocInput label="Pièce d'identité (CIN, recto-verso)" file={idDoc} onChange={setIdDoc} />
+                  <DocInput label="Diplôme ou attestation" file={diploma} onChange={setDiploma} />
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Ces documents restent privés. Statut : en attente de vérification.
+                </p>
+              </section>
+            </>
+          )}
+
           <button type="submit" disabled={saving}
             className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90 disabled:opacity-60">
             {saving ? "..." : "Continuer"}
@@ -159,5 +203,18 @@ function Onboarding() {
         </form>
       </div>
     </div>
+  );
+}
+
+function DocInput({ label, file, onChange }: { label: string; file: File | null; onChange: (f: File | null) => void }) {
+  return (
+    <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-border bg-background px-3 py-2.5 text-sm hover:bg-secondary/40">
+      <Upload className="h-4 w-4 text-primary" />
+      <div className="flex-1">
+        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="font-medium">{file?.name ?? "Choisir un fichier"}</div>
+      </div>
+      <input type="file" accept="image/*,application/pdf" onChange={(e) => onChange(e.target.files?.[0] ?? null)} className="hidden" />
+    </label>
   );
 }

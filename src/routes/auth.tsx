@@ -22,6 +22,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [awaitingConfirm, setAwaitingConfirm] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -34,7 +35,7 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -43,8 +44,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Compte créé !");
-        navigate({ to: "/onboarding" });
+        if (data.session) {
+          toast.success("Compte créé !");
+          navigate({ to: "/onboarding" });
+        } else {
+          setAwaitingConfirm(true);
+          toast.success("Vérifie ta boîte mail pour confirmer ton compte.");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -71,6 +77,19 @@ function AuthPage() {
           <span className="text-lg font-semibold">Ostadi</span>
         </Link>
         <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
+          {awaitingConfirm ? (
+            <>
+              <h1 className="text-2xl font-bold">Confirme ton email 📩</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                On vient d'envoyer un lien de vérification à <b>{email}</b>. Clique dessus pour activer ton compte, puis reviens te connecter.
+              </p>
+              <button onClick={() => { setAwaitingConfirm(false); setMode("signin"); }}
+                className="mt-6 w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground">
+                J'ai confirmé, se connecter
+              </button>
+            </>
+          ) : (
+          <>
           <h1 className="text-2xl font-bold">
             {mode === "signup" ? "Créer un compte" : "Bon retour !"}
           </h1>
@@ -128,6 +147,8 @@ function AuthPage() {
               {mode === "signup" ? "Se connecter" : "S'inscrire"}
             </button>
           </p>
+          </>
+          )}
         </div>
       </div>
     </div>

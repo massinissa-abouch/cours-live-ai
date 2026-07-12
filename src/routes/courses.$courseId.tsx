@@ -1,7 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, PlayCircle, Lock, Star, Users, Clock, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { enrollCourse, getVideoSignedUrl } from "@/lib/course.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/courses/$courseId")({
   component: CourseDetail,
@@ -18,6 +21,9 @@ type Review = { id: string; rating: number; comment: string | null; created_at: 
 
 function CourseDetail() {
   const { courseId } = Route.useParams();
+  const navigate = useNavigate();
+  const enroll = useServerFn(enrollCourse);
+  const getVid = useServerFn(getVideoSignedUrl);
   const [course, setCourse] = useState<Course | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
@@ -26,6 +32,10 @@ function CourseDetail() {
   const [teacherAvatar, setTeacherAvatar] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [activeChapter, setActiveChapter] = useState(0);
+  const [chapterUrl, setChapterUrl] = useState<string | null>(null);
+  const [chapterLoading, setChapterLoading] = useState(false);
+  const [enrolling, setEnrolling] = useState(false);
+  const [authed, setAuthed] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -54,12 +64,48 @@ function CourseDetail() {
       setReviews(rvs ?? []);
       const { data: user } = await supabase.auth.getUser();
       if (user.user) {
+        setAuthed(true);
         const { data: e } = await supabase.from("course_enrollments")
           .select("id").eq("course_id", courseId).eq("student_id", user.user.id).maybeSingle();
         setEnrolled(!!e);
       }
     })();
   }, [courseId]);
+
+  useEffect(() => {
+    setChapterUrl(null);
+    const v = videos[activeChapter];
+    if (!v) return;
+    if (!enrolled && !v.is_free_preview) return;
+    (async () => {
+      setChapterLoading(true);
+      try {
+        const res = await getVid({ data: { videoId: v.id } });
+        setChapterUrl(res.url);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Erreur vidéo");
+      } finally {
+        setChapterLoading(false);
+      }
+    })();
+  }, [activeChapter, videos, enrolled, getVid]);
+
+  async function handleEnroll() {
+    if (!authed) {
+      navigate({ to: "/auth", search: { mode: "signup", role: "student" } });
+      return;
+    }
+    setEnrolling(true);
+    try {
+      await enroll({ data: { courseId } });
+      setEnrolled(true);
+      toast.success("Inscription confirmée ✓");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setEnrolling(false);
+    }
+  }
 
   const stats = useMemo(() => ({
     duration: videos.length * 12,
@@ -91,7 +137,11 @@ function CourseDetail() {
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
             <div className="relative aspect-video overflow-hidden rounded-3xl border border-border/60 bg-black shadow-[0_30px_80px_-30px_hsl(var(--primary)/0.5)]">
-              {trailerUrl ? (
+              {chapterUrl ? (
+                <video key={chapterUrl} src={chapterUrl} controls autoPlay className="h-full w-full" />
+              ) : chapterLoading ? (
+                <div className="grid h-full place-items-center text-white/40">Chargement de la vidéo…</div>
+              ) : trailerUrl ? (
                 <video src={trailerUrl} controls className="h-full w-full" />
               ) : (
                 <div className="grid h-full place-items-center text-white/40">Chargement du trailer…</div>
@@ -239,12 +289,13 @@ function CourseDetail() {
               <div className="mt-1 text-xs text-muted-foreground">Accès à vie · Mises à jour incluses</div>
 
               <button
-                disabled={enrolled}
+                disabled={enrolled || enrolling}
+                onClick={handleEnroll}
                 className="mt-5 w-full rounded-2xl bg-gradient-to-r from-primary to-primary/80 px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_hsl(var(--primary)/0.7)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {enrolled ? "Déjà inscrit ✓" : "S'inscrire au cours"}
+                {enrolled ? "Déjà inscrit ✓" : enrolling ? "…" : "S'inscrire au cours"}
               </button>
-              <div className="mt-2 text-center text-[11px] text-muted-foreground">Paiement sécurisé · Bientôt disponible</div>
+              <div className="mt-2 text-center text-[11px] text-muted-foreground">Inscription auto-validée · Paiement bientôt intégré</div>
 
               <div className="mt-6 space-y-3 text-sm">
                 {[

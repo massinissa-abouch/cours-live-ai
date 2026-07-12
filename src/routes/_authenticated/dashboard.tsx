@@ -1,16 +1,32 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Video, Sparkles, LogOut, GraduationCap } from "lucide-react";
+import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock } from "lucide-react";
+import { listMyEnrollments } from "@/lib/course.functions";
+import { listMyBookings } from "@/lib/live-session.functions";
+import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
 
+type EnrollmentRow = { id: string; progress: number; course: { id: string; title: string; subject: string; level: string; thumbnail_url: string | null; teacher_id: string } | null };
+type BookingRow = { id: string; status: string; mode: string; session: { id: string; title: string | null; subject: string; scheduled_at: string; duration_min: number; teacher_id: string; status: string } | null };
+type Notif = Awaited<ReturnType<typeof listMyNotifications>>[number];
+
 function Dashboard() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
   const [isTeacher, setIsTeacher] = useState(false);
+  const loadEnroll = useServerFn(listMyEnrollments);
+  const loadBooks = useServerFn(listMyBookings);
+  const loadNotif = useServerFn(listMyNotifications);
+  const markRead = useServerFn(markNotificationRead);
+  const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
+  const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [notifs, setNotifs] = useState<Notif[]>([]);
+  const [showNotifs, setShowNotifs] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -20,13 +36,25 @@ function Dashboard() {
       const { data: roles } = await supabase
         .from("user_roles").select("role").eq("user_id", user.id);
       setIsTeacher((roles ?? []).some((r) => r.role === "teacher"));
+      const [e, b, n] = await Promise.all([loadEnroll(), loadBooks(), loadNotif()]);
+      setEnrollments(e as EnrollmentRow[]);
+      setBookings(b as BookingRow[]);
+      setNotifs(n);
     })();
-  }, [user.id, navigate]);
+  }, [user.id, navigate, loadEnroll, loadBooks, loadNotif]);
 
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/" });
   }
+
+  const now = Date.now();
+  const upcoming = bookings
+    .filter((b) => b.session && new Date(b.session.scheduled_at).getTime() >= now - 30 * 60_000)
+    .sort((a, b) => new Date(a.session!.scheduled_at).getTime() - new Date(b.session!.scheduled_at).getTime());
+  const past = bookings
+    .filter((b) => b.session && new Date(b.session.scheduled_at).getTime() < now - 30 * 60_000);
+  const unread = notifs.filter((n) => !n.read_at).length;
 
   const cards = [
     { icon: BookOpen, title: "Catalogue de cours", desc: "Trouve un cours vidéo", to: "/courses" as const },
@@ -42,9 +70,32 @@ function Dashboard() {
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground font-bold">أ</div>
             <span className="font-semibold">Ostadi</span>
           </Link>
-          <button onClick={signOut} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-secondary">
-            <LogOut className="h-4 w-4" /> Déconnexion
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button onClick={() => { setShowNotifs((s) => !s); if (unread) markRead({ data: { all: true } }).then(() => setNotifs((ns) => ns.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })))); }}
+                className="relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Bell className="h-4 w-4" />
+                {unread > 0 && <span className="absolute -right-0.5 -top-0.5 h-4 min-w-4 rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground grid place-items-center">{unread}</span>}
+              </button>
+              {showNotifs && (
+                <div className="absolute right-0 top-full z-20 mt-2 w-80 rounded-2xl border border-border bg-card p-2 shadow-xl">
+                  {notifs.length === 0 ? (
+                    <div className="p-4 text-sm text-muted-foreground">Aucune notification.</div>
+                  ) : notifs.slice(0, 8).map((n) => (
+                    <Link key={n.id} to={n.link ?? "/dashboard"} onClick={() => setShowNotifs(false)}
+                      className="block rounded-lg px-3 py-2 hover:bg-secondary">
+                      <div className="text-sm font-medium">{n.title}</div>
+                      {n.body && <div className="text-xs text-muted-foreground line-clamp-2">{n.body}</div>}
+                      <div className="text-[10px] text-muted-foreground/70">{new Date(n.created_at).toLocaleString("fr-FR")}</div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button onClick={signOut} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+              <LogOut className="h-4 w-4" /> Déconnexion
+            </button>
+          </div>
         </div>
       </header>
 
@@ -83,12 +134,73 @@ function Dashboard() {
           </Link>
         )}
 
-        <div className="mt-10 rounded-2xl border border-dashed border-border bg-secondary/50 p-6">
-          <p className="text-sm text-muted-foreground">
-            Ton tableau de bord se remplira à mesure que tu utilises la plateforme :
-            cours en cours, sessions à venir, streak IA, badges…
-          </p>
-        </div>
+        <section className="mt-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Sessions à venir</h2>
+            <Link to="/teachers" className="text-xs text-primary hover:underline">Réserver un autre créneau →</Link>
+          </div>
+          {upcoming.length === 0 ? (
+            <div className="mt-3 rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">Aucune session à venir.</div>
+          ) : (
+            <div className="mt-3 grid gap-2">
+              {upcoming.map((b) => (
+                <Link key={b.id} to="/live/$sessionId" params={{ sessionId: b.session!.id }}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 hover:border-primary/40">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary"><Video className="h-4 w-4" /></div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold">{b.session!.title ?? b.session!.subject}</div>
+                    <div className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> {new Date(b.session!.scheduled_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })} · {b.session!.duration_min} min · {b.mode}
+                    </div>
+                  </div>
+                  <span className="text-xs text-primary">→</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="mt-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Mes cours</h2>
+            <Link to="/courses" className="text-xs text-primary hover:underline">Découvrir plus →</Link>
+          </div>
+          {enrollments.length === 0 ? (
+            <div className="mt-3 rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">Tu n'es inscrit à aucun cours.</div>
+          ) : (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {enrollments.map((e) => e.course && (
+                <Link key={e.id} to="/courses/$courseId" params={{ courseId: e.course.id }}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 hover:border-primary/40">
+                  <div className="grid h-12 w-16 place-items-center overflow-hidden rounded-lg bg-primary/10 text-primary">
+                    {e.course.thumbnail_url ? <img src={e.course.thumbnail_url} alt="" className="h-full w-full object-cover" /> : <BookOpen className="h-4 w-4" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold line-clamp-1">{e.course.title}</div>
+                    <div className="text-xs text-muted-foreground">{e.course.subject}</div>
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
+                      <div className="h-full bg-primary" style={{ width: `${e.progress}%` }} />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {past.length > 0 && (
+          <section className="mt-10">
+            <h2 className="text-lg font-semibold">Sessions passées</h2>
+            <div className="mt-3 grid gap-2">
+              {past.slice(0, 5).map((b) => (
+                <div key={b.id} className="flex items-center justify-between rounded-xl border border-border/60 bg-card/60 p-3 text-sm">
+                  <span>{b.session!.title ?? b.session!.subject}</span>
+                  <span className="text-xs text-muted-foreground">{new Date(b.session!.scheduled_at).toLocaleDateString("fr-FR")}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
