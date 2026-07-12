@@ -168,6 +168,34 @@ function Onboarding() {
               className="mt-3 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm" />
           </section>
 
+          {role === "teacher" && (
+            <>
+              <section>
+                <label className="text-sm font-semibold">Matières enseignées</label>
+                <input value={subjects} onChange={(e) => setSubjects(e.target.value)}
+                  placeholder="Ex: Mathématiques, Physique, SVT (séparées par des virgules)"
+                  className="mt-3 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm" />
+              </section>
+              <section>
+                <label className="text-sm font-semibold">Tarif horaire (DZD)</label>
+                <input type="number" min={0} value={hourlyRate} onChange={(e) => setHourlyRate(Number(e.target.value))}
+                  className="mt-3 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm" />
+              </section>
+              <section className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+                <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                  <ShieldCheck className="h-4 w-4" /> Vérification prof (nécessaire pour le badge « vérifié »)
+                </div>
+                <div className="mt-3 space-y-2">
+                  <DocInput label="Pièce d'identité (CIN, recto-verso)" file={idDoc} onChange={setIdDoc} />
+                  <DocInput label="Diplôme ou attestation" file={diploma} onChange={setDiploma} />
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Ces documents restent privés. Statut : en attente de vérification.
+                </p>
+              </section>
+            </>
+          )}
+
           <button type="submit" disabled={saving}
             className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] hover:opacity-90 disabled:opacity-60">
             {saving ? "..." : "Continuer"}
@@ -175,5 +203,18 @@ function Onboarding() {
         </form>
       </div>
     </div>
+  );
+}
+
+function DocInput({ label, file, onChange }: { label: string; file: File | null; onChange: (f: File | null) => void }) {
+  return (
+    <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-border bg-background px-3 py-2.5 text-sm hover:bg-secondary/40">
+      <Upload className="h-4 w-4 text-primary" />
+      <div className="flex-1">
+        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="font-medium">{file?.name ?? "Choisir un fichier"}</div>
+      </div>
+      <input type="file" accept="image/*,application/pdf" onChange={(e) => onChange(e.target.files?.[0] ?? null)} className="hidden" />
+    </label>
   );
 }
