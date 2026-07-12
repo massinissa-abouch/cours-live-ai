@@ -137,7 +137,11 @@ function CourseDetail() {
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
             <div className="relative aspect-video overflow-hidden rounded-3xl border border-border/60 bg-black shadow-[0_30px_80px_-30px_hsl(var(--primary)/0.5)]">
-              {trailerUrl ? (
+              {chapterUrl ? (
+                <video key={chapterUrl} src={chapterUrl} controls autoPlay className="h-full w-full" />
+              ) : chapterLoading ? (
+                <div className="grid h-full place-items-center text-white/40">Chargement de la vidéo…</div>
+              ) : trailerUrl ? (
                 <video src={trailerUrl} controls className="h-full w-full" />
               ) : (
                 <div className="grid h-full place-items-center text-white/40">Chargement du trailer…</div>
@@ -285,12 +289,13 @@ function CourseDetail() {
               <div className="mt-1 text-xs text-muted-foreground">Accès à vie · Mises à jour incluses</div>
 
               <button
-                disabled={enrolled}
+                disabled={enrolled || enrolling}
+                onClick={handleEnroll}
                 className="mt-5 w-full rounded-2xl bg-gradient-to-r from-primary to-primary/80 px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_hsl(var(--primary)/0.7)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {enrolled ? "Déjà inscrit ✓" : "S'inscrire au cours"}
+                {enrolled ? "Déjà inscrit ✓" : enrolling ? "…" : "S'inscrire au cours"}
               </button>
-              <div className="mt-2 text-center text-[11px] text-muted-foreground">Paiement sécurisé · Bientôt disponible</div>
+              <div className="mt-2 text-center text-[11px] text-muted-foreground">Inscription auto-validée · Paiement bientôt intégré</div>
 
               <div className="mt-6 space-y-3 text-sm">
                 {[
