@@ -77,7 +77,7 @@ function NewCourse() {
       if (error) throw error;
 
       toast.success("Cours publié !");
-      navigate({ to: "/courses/$courseId", params: { courseId: data.id } });
+      navigate({ to: "/teacher/courses/$courseId/chapters", params: { courseId: data.id } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erreur upload");
     } finally {

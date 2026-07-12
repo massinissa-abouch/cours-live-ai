@@ -32,6 +32,7 @@ import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedAiExamNewRouteImport } from './routes/_authenticated/ai.exam.new'
 import { Route as AuthenticatedAiExamExamIdRouteImport } from './routes/_authenticated/ai.exam.$examId'
 import { Route as AuthenticatedAiCConversationIdRouteImport } from './routes/_authenticated/ai.c.$conversationId'
+import { Route as AuthenticatedTeacherCoursesCourseIdChaptersRouteImport } from './routes/_authenticated/teacher.courses.$courseId.chapters'
 
 const TeachersRoute = TeachersRouteImport.update({
   id: '/teachers',
@@ -155,6 +156,12 @@ const AuthenticatedAiCConversationIdRoute =
     path: '/c/$conversationId',
     getParentRoute: () => AuthenticatedAiRoute,
   } as any)
+const AuthenticatedTeacherCoursesCourseIdChaptersRoute =
+  AuthenticatedTeacherCoursesCourseIdChaptersRouteImport.update({
+    id: '/teacher/courses/$courseId/chapters',
+    path: '/teacher/courses/$courseId/chapters',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -202,6 +210,7 @@ export interface FileRoutesByTo {
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -228,6 +237,7 @@ export interface FileRoutesById {
   '/_authenticated/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/_authenticated/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/_authenticated/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/ai/sheets/$sheetId'
     | '/sessions/book/$teacherId'
     | '/teacher/courses/new'
+    | '/teacher/courses/$courseId/chapters'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/ai/sheets/$sheetId'
     | '/sessions/book/$teacherId'
     | '/teacher/courses/new'
+    | '/teacher/courses/$courseId/chapters'
   id:
     | '__root__'
     | '/'
@@ -302,6 +314,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ai/sheets/$sheetId'
     | '/_authenticated/sessions/book/$teacherId'
     | '/_authenticated/teacher/courses/new'
+    | '/_authenticated/teacher/courses/$courseId/chapters'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -478,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiCConversationIdRouteImport
       parentRoute: typeof AuthenticatedAiRoute
     }
+    '/_authenticated/teacher/courses/$courseId/chapters': {
+      id: '/_authenticated/teacher/courses/$courseId/chapters'
+      path: '/teacher/courses/$courseId/chapters'
+      fullPath: '/teacher/courses/$courseId/chapters'
+      preLoaderRoute: typeof AuthenticatedTeacherCoursesCourseIdChaptersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -523,6 +543,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedSessionsBookTeacherIdRoute: typeof AuthenticatedSessionsBookTeacherIdRoute
   AuthenticatedTeacherCoursesNewRoute: typeof AuthenticatedTeacherCoursesNewRoute
+  AuthenticatedTeacherCoursesCourseIdChaptersRoute: typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -535,6 +556,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSessionsBookTeacherIdRoute:
     AuthenticatedSessionsBookTeacherIdRoute,
   AuthenticatedTeacherCoursesNewRoute: AuthenticatedTeacherCoursesNewRoute,
+  AuthenticatedTeacherCoursesCourseIdChaptersRoute:
+    AuthenticatedTeacherCoursesCourseIdChaptersRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
