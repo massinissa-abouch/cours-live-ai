@@ -2,10 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock } from "lucide-react";
+import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp } from "lucide-react";
 import { listMyEnrollments } from "@/lib/course.functions";
 import { listMyBookings } from "@/lib/live-session.functions";
 import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
+import { getAiCostSummary } from "@/lib/ai-cost.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -19,10 +20,13 @@ function Dashboard() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
   const [isTeacher, setIsTeacher] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [aiCost, setAiCost] = useState<Awaited<ReturnType<typeof getAiCostSummary>> | null>(null);
   const loadEnroll = useServerFn(listMyEnrollments);
   const loadBooks = useServerFn(listMyBookings);
   const loadNotif = useServerFn(listMyNotifications);
   const markRead = useServerFn(markNotificationRead);
+  const loadCost = useServerFn(getAiCostSummary);
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [notifs, setNotifs] = useState<Notif[]>([]);
@@ -36,12 +40,17 @@ function Dashboard() {
       const { data: roles } = await supabase
         .from("user_roles").select("role").eq("user_id", user.id);
       setIsTeacher((roles ?? []).some((r) => r.role === "teacher"));
+      const admin = (roles ?? []).some((r) => r.role === "admin");
+      setIsAdmin(admin);
       const [e, b, n] = await Promise.all([loadEnroll(), loadBooks(), loadNotif()]);
       setEnrollments(e as EnrollmentRow[]);
       setBookings(b as BookingRow[]);
       setNotifs(n);
+      if (admin) {
+        try { setAiCost(await loadCost()); } catch { /* ignore */ }
+      }
     })();
-  }, [user.id, navigate, loadEnroll, loadBooks, loadNotif]);
+  }, [user.id, navigate, loadEnroll, loadBooks, loadNotif, loadCost]);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -128,6 +137,36 @@ function Dashboard() {
               <div>
                 <div className="font-semibold">Espace prof</div>
                 <div className="text-sm text-muted-foreground">Publie tes cours et gère tes créneaux</div>
+              </div>
+            </div>
+            <span className="text-primary">→</span>
+          </Link>
+        )}
+
+        {isAdmin && aiCost && (
+          <Link to="/admin"
+            className={`mt-6 flex items-center justify-between rounded-2xl border p-5 transition ${
+              aiCost.overBudget
+                ? "border-destructive bg-destructive/10 hover:bg-destructive/15"
+                : aiCost.overAlert
+                  ? "border-orange-500/40 bg-orange-500/10 hover:bg-orange-500/15"
+                  : "border-border bg-card hover:bg-secondary"
+            }`}>
+            <div className="flex items-center gap-3">
+              {aiCost.overAlert ? (
+                <ShieldAlert className={`h-6 w-6 ${aiCost.overBudget ? "text-destructive" : "text-orange-500"}`} />
+              ) : (
+                <TrendingUp className="h-6 w-6 text-primary" />
+              )}
+              <div>
+                <div className="font-semibold">
+                  {aiCost.overBudget
+                    ? `⚠️ Budget IA dépassé — ${aiCost.monthTotal.toFixed(2)} € / ${aiCost.budget} €`
+                    : aiCost.overAlert
+                      ? `⚠️ Alerte coût IA — ${aiCost.monthTotal.toFixed(2)} € (seuil ${aiCost.alertThreshold} €)`
+                      : `Coût IA du mois : ${aiCost.monthTotal.toFixed(2)} € / ${aiCost.budget} €`}
+                </div>
+                <div className="text-sm text-muted-foreground">Ouvrir le tableau de bord admin</div>
               </div>
             </div>
             <span className="text-primary">→</span>

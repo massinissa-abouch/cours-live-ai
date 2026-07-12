@@ -293,6 +293,42 @@ export type Database = {
           },
         ]
       }
+      ai_usage: {
+        Row: {
+          conversation_id: string | null
+          cost_eur: number
+          created_at: string
+          id: string
+          input_tokens: number
+          mode: string | null
+          model: string
+          output_tokens: number
+          user_id: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          cost_eur?: number
+          created_at?: string
+          id?: string
+          input_tokens?: number
+          mode?: string | null
+          model: string
+          output_tokens?: number
+          user_id?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          cost_eur?: number
+          created_at?: string
+          id?: string
+          input_tokens?: number
+          mode?: string | null
+          model?: string
+          output_tokens?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       course_enrollments: {
         Row: {
           course_id: string
