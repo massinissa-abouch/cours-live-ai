@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Trash2, Plus, Clock } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Clock, Video } from "lucide-react";
 import { toast } from "sonner";
+import { createSessionSlot } from "@/lib/live-session.functions";
 
 export const Route = createFileRoute("/_authenticated/teacher/availability")({
   component: TeacherAvailability,
@@ -20,6 +22,38 @@ function TeacherAvailability() {
   const [end, setEnd] = useState("18:00");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const createSlot = useServerFn(createSessionSlot);
+  const [ssTitle, setSsTitle] = useState("");
+  const [ssSubject, setSsSubject] = useState("");
+  const [ssDate, setSsDate] = useState("");
+  const [ssTime, setSsTime] = useState("17:00");
+  const [ssDur, setSsDur] = useState(60);
+  const [ssType, setSsType] = useState<"solo" | "group">("solo");
+  const [ssMax, setSsMax] = useState(3);
+  const [ssPrice, setSsPrice] = useState(1500);
+  const [ssBusy, setSsBusy] = useState(false);
+
+  async function addSession(e: React.FormEvent) {
+    e.preventDefault();
+    if (!ssDate) { toast.error("Date obligatoire"); return; }
+    setSsBusy(true);
+    try {
+      await createSlot({ data: {
+        title: ssTitle || undefined,
+        subject: ssSubject,
+        level: "lycee_3_sciences",
+        scheduledAt: new Date(`${ssDate}T${ssTime}`).toISOString(),
+        durationMin: ssDur,
+        sessionType: ssType,
+        maxStudents: ssMax,
+        pricePerStudent: ssPrice,
+      }});
+      toast.success("Session publiée ✓");
+      setSsTitle(""); setSsSubject(""); setSsDate("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    } finally { setSsBusy(false); }
+  }
 
   async function reload() {
     const { data } = await supabase
