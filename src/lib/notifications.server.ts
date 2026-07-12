@@ -1,10 +1,7 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/integrations/supabase/types";
-
-type Client = SupabaseClient<Database>;
+// Server-only helper: creates notifications for any user via the service role
+// client, bypassing RLS. Only load from inside server function handlers.
 
 export async function notify(
-  supabase: Client,
   userId: string,
   type: string,
   title: string,
@@ -12,7 +9,8 @@ export async function notify(
   link?: string,
 ) {
   try {
-    await supabase.from("notifications").insert({
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("notifications").insert({
       user_id: userId,
       type,
       title,
