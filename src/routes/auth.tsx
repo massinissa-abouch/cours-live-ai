@@ -77,6 +77,19 @@ function AuthPage() {
           <span className="text-lg font-semibold">Ostadi</span>
         </Link>
         <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
+          {awaitingConfirm ? (
+            <>
+              <h1 className="text-2xl font-bold">Confirme ton email 📩</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                On vient d'envoyer un lien de vérification à <b>{email}</b>. Clique dessus pour activer ton compte, puis reviens te connecter.
+              </p>
+              <button onClick={() => { setAwaitingConfirm(false); setMode("signin"); }}
+                className="mt-6 w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground">
+                J'ai confirmé, se connecter
+              </button>
+            </>
+          ) : (
+          <>
           <h1 className="text-2xl font-bold">
             {mode === "signup" ? "Créer un compte" : "Bon retour !"}
           </h1>
@@ -134,6 +147,8 @@ function AuthPage() {
               {mode === "signup" ? "Se connecter" : "S'inscrire"}
             </button>
           </p>
+          </>
+          )}
         </div>
       </div>
     </div>
