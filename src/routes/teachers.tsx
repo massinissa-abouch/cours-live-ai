@@ -194,7 +194,14 @@ function Teachers() {
 
                 <button
                   className="mt-4 w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-                  onClick={() => alert("La réservation arrive très bientôt ⏳")}
+                  onClick={async () => {
+                    const { data } = await supabase.auth.getUser();
+                    if (!data.user) {
+                      navigate({ to: "/auth", search: { mode: "signin", role: "student" } });
+                      return;
+                    }
+                    navigate({ to: "/sessions/book/$teacherId", params: { teacherId: t.user_id } });
+                  }}
                 >
                   Réserver un créneau
                 </button>
