@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { GraduationCap, Users, Sparkles } from "lucide-react";
+import { GraduationCap, Users, Sparkles, Upload, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
@@ -49,18 +49,24 @@ function Onboarding() {
   const [exam, setExam] = useState<"none" | "bem" | "bac">("bac");
   const [wilaya, setWilaya] = useState("");
   const [saving, setSaving] = useState(false);
+  const [subjects, setSubjects] = useState("");
+  const [hourlyRate, setHourlyRate] = useState(1500);
+  const [idDoc, setIdDoc] = useState<File | null>(null);
+  const [diploma, setDiploma] = useState<File | null>(null);
 
   useEffect(() => {
-    // If already onboarded (student with level or teacher with subjects), skip
     (async () => {
-      const { data } = await supabase
-        .from("student_profiles")
-        .select("school_level")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (data?.school_level) navigate({ to: "/dashboard" });
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
+      if ((roles ?? []).some((r) => r.role === "teacher")) setRole("teacher");
     })();
-  }, [user.id, navigate]);
+  }, [user.id]);
+
+  async function uploadDoc(file: File, kind: string) {
+    const path = `${user.id}/${kind}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+    const { error } = await supabase.storage.from("teacher-docs").upload(path, file, { upsert: true });
+    if (error) throw error;
+    return path;
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -68,7 +74,7 @@ function Onboarding() {
     try {
       // Ensure role
       if (role !== "student") {
-        await supabase.from("user_roles").insert({ user_id: user.id, role });
+        await supabase.from("user_roles").upsert({ user_id: user.id, role }, { onConflict: "user_id,role" });
       }
       // Save wilaya
       if (wilaya) {
@@ -80,9 +86,19 @@ function Onboarding() {
         .upsert({ user_id: user.id, school_level: level, exam_target: exam });
 
       if (role === "teacher") {
+        const idPath = idDoc ? await uploadDoc(idDoc, "id") : undefined;
+        const diplomaPath = diploma ? await uploadDoc(diploma, "diploma") : undefined;
         await supabase
           .from("teacher_profiles")
-          .upsert({ user_id: user.id, subjects: [], levels: [level] });
+          .upsert({
+            user_id: user.id,
+            subjects: subjects.split(",").map((s) => s.trim()).filter(Boolean),
+            levels: [level],
+            hourly_rate: hourlyRate,
+            id_document_url: idPath ?? null,
+            diploma_url: diplomaPath ?? null,
+            verification_status: "pending",
+          });
         navigate({ to: "/teacher" });
       } else {
         navigate({ to: "/dashboard" });
