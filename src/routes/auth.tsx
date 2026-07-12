@@ -22,6 +22,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [awaitingConfirm, setAwaitingConfirm] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -34,7 +35,7 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -43,8 +44,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Compte créé !");
-        navigate({ to: "/onboarding" });
+        if (data.session) {
+          toast.success("Compte créé !");
+          navigate({ to: "/onboarding" });
+        } else {
+          setAwaitingConfirm(true);
+          toast.success("Vérifie ta boîte mail pour confirmer ton compte.");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
