@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench, Archive, Flame, Gift } from "lucide-react";
+import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench, Archive, Flame, Gift, Users } from "lucide-react";
 import { listMyEnrollments } from "@/lib/course.functions";
 import { listMyBookings } from "@/lib/live-session.functions";
 import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
@@ -79,6 +79,7 @@ function Dashboard() {
     { icon: Sparkles, title: "Entraînement IA", desc: "Génère un exercice", to: "/ai" as const },
     { icon: Wrench, title: "Outils élève", desc: "Moyenne, compte à rebours, banque d'exercices", to: "/tools" as const },
     { icon: Archive, title: "Archive Bac & BEM", desc: "Sujets et corrigés officiels", to: "/archive" as const },
+    { icon: Users, title: "Groupes de révision", desc: "Chat, ressources & Pomodoro entre camarades", to: "/groups" as const },
   ];
 
   return (

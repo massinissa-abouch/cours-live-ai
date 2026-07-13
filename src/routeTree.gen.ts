@@ -25,6 +25,7 @@ import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authenticated/tools.index'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
+import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenticated/groups.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
 import { Route as AuthenticatedToolsExercisesRouteImport } from './routes/_authenticated/tools.exercises'
@@ -32,6 +33,7 @@ import { Route as AuthenticatedToolsCountdownRouteImport } from './routes/_authe
 import { Route as AuthenticatedToolsCalculatorRouteImport } from './routes/_authenticated/tools.calculator'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedLiveSessionIdRouteImport } from './routes/_authenticated/live.$sessionId'
+import { Route as AuthenticatedGroupsGroupIdRouteImport } from './routes/_authenticated/groups.$groupId'
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
 import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin_.archive'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
@@ -122,6 +124,12 @@ const AuthenticatedTeacherIndexRoute =
     path: '/teacher/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedGroupsIndexRoute =
+  AuthenticatedGroupsIndexRouteImport.update({
+    id: '/groups/',
+    path: '/groups/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAiIndexRoute = AuthenticatedAiIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -160,6 +168,12 @@ const AuthenticatedLiveSessionIdRoute =
   AuthenticatedLiveSessionIdRouteImport.update({
     id: '/live/$sessionId',
     path: '/live/$sessionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedGroupsGroupIdRoute =
+  AuthenticatedGroupsGroupIdRouteImport.update({
+    id: '/groups/$groupId',
+    path: '/groups/$groupId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAiSheetsRoute = AuthenticatedAiSheetsRouteImport.update({
@@ -231,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
   '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
@@ -238,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
+  '/groups/': typeof AuthenticatedGroupsIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/tools/': typeof AuthenticatedToolsIndexRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
@@ -263,6 +279,7 @@ export interface FileRoutesByTo {
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
   '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
@@ -270,6 +287,7 @@ export interface FileRoutesByTo {
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
+  '/groups': typeof AuthenticatedGroupsIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/tools': typeof AuthenticatedToolsIndexRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
@@ -298,6 +316,7 @@ export interface FileRoutesById {
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/_authenticated/admin_/archive': typeof AuthenticatedAdminArchiveRoute
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/_authenticated/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
   '/_authenticated/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/_authenticated/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
@@ -305,6 +324,7 @@ export interface FileRoutesById {
   '/_authenticated/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
+  '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
   '/_authenticated/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
@@ -333,6 +353,7 @@ export interface FileRouteTypes {
     | '/sessions/$sessionId'
     | '/admin/archive'
     | '/ai/sheets'
+    | '/groups/$groupId'
     | '/live/$sessionId'
     | '/teacher/availability'
     | '/tools/calculator'
@@ -340,6 +361,7 @@ export interface FileRouteTypes {
     | '/tools/exercises'
     | '/api/chat/$conversationId'
     | '/ai/'
+    | '/groups/'
     | '/teacher/'
     | '/tools/'
     | '/ai/c/$conversationId'
@@ -365,6 +387,7 @@ export interface FileRouteTypes {
     | '/sessions/$sessionId'
     | '/admin/archive'
     | '/ai/sheets'
+    | '/groups/$groupId'
     | '/live/$sessionId'
     | '/teacher/availability'
     | '/tools/calculator'
@@ -372,6 +395,7 @@ export interface FileRouteTypes {
     | '/tools/exercises'
     | '/api/chat/$conversationId'
     | '/ai'
+    | '/groups'
     | '/teacher'
     | '/tools'
     | '/ai/c/$conversationId'
@@ -399,6 +423,7 @@ export interface FileRouteTypes {
     | '/sessions/$sessionId'
     | '/_authenticated/admin_/archive'
     | '/_authenticated/ai/sheets'
+    | '/_authenticated/groups/$groupId'
     | '/_authenticated/live/$sessionId'
     | '/_authenticated/teacher/availability'
     | '/_authenticated/tools/calculator'
@@ -406,6 +431,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tools/exercises'
     | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
+    | '/_authenticated/groups/'
     | '/_authenticated/teacher/'
     | '/_authenticated/tools/'
     | '/_authenticated/ai/c/$conversationId'
@@ -542,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeacherIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/groups/': {
+      id: '/_authenticated/groups/'
+      path: '/groups'
+      fullPath: '/groups/'
+      preLoaderRoute: typeof AuthenticatedGroupsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ai/': {
       id: '/_authenticated/ai/'
       path: '/'
@@ -589,6 +622,13 @@ declare module '@tanstack/react-router' {
       path: '/live/$sessionId'
       fullPath: '/live/$sessionId'
       preLoaderRoute: typeof AuthenticatedLiveSessionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/groups/$groupId': {
+      id: '/_authenticated/groups/$groupId'
+      path: '/groups/$groupId'
+      fullPath: '/groups/$groupId'
+      preLoaderRoute: typeof AuthenticatedGroupsGroupIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ai/sheets': {
@@ -698,11 +738,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedAdminArchiveRoute: typeof AuthenticatedAdminArchiveRoute
+  AuthenticatedGroupsGroupIdRoute: typeof AuthenticatedGroupsGroupIdRoute
   AuthenticatedLiveSessionIdRoute: typeof AuthenticatedLiveSessionIdRoute
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
   AuthenticatedToolsCalculatorRoute: typeof AuthenticatedToolsCalculatorRoute
   AuthenticatedToolsCountdownRoute: typeof AuthenticatedToolsCountdownRoute
   AuthenticatedToolsExercisesRoute: typeof AuthenticatedToolsExercisesRoute
+  AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedToolsIndexRoute: typeof AuthenticatedToolsIndexRoute
   AuthenticatedSessionsBookTeacherIdRoute: typeof AuthenticatedSessionsBookTeacherIdRoute
@@ -718,11 +760,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInviteRoute: AuthenticatedInviteRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedAdminArchiveRoute: AuthenticatedAdminArchiveRoute,
+  AuthenticatedGroupsGroupIdRoute: AuthenticatedGroupsGroupIdRoute,
   AuthenticatedLiveSessionIdRoute: AuthenticatedLiveSessionIdRoute,
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
   AuthenticatedToolsCalculatorRoute: AuthenticatedToolsCalculatorRoute,
   AuthenticatedToolsCountdownRoute: AuthenticatedToolsCountdownRoute,
   AuthenticatedToolsExercisesRoute: AuthenticatedToolsExercisesRoute,
+  AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
   AuthenticatedToolsIndexRoute: AuthenticatedToolsIndexRoute,
   AuthenticatedSessionsBookTeacherIdRoute:
