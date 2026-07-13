@@ -1188,6 +1188,36 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth_key: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       quiz_responses: {
         Row: {
           answer: string
@@ -1512,6 +1542,95 @@ export type Database = {
         }
         Relationships: []
       }
+      student_tasks: {
+        Row: {
+          actual_minutes: number | null
+          ai_analysis: Json | null
+          channels: string[]
+          chapter: string | null
+          completed_at: string | null
+          created_at: string
+          difficulty: number
+          due_at: string | null
+          estimated_minutes: number
+          group_id: string | null
+          id: string
+          level: string | null
+          notes: string | null
+          priority_score: number
+          reminder_at: string | null
+          self_grade: number | null
+          share_with_group: boolean
+          source_content: string | null
+          source_type: string
+          status: string
+          student_id: string
+          subject: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          actual_minutes?: number | null
+          ai_analysis?: Json | null
+          channels?: string[]
+          chapter?: string | null
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: number
+          due_at?: string | null
+          estimated_minutes?: number
+          group_id?: string | null
+          id?: string
+          level?: string | null
+          notes?: string | null
+          priority_score?: number
+          reminder_at?: string | null
+          self_grade?: number | null
+          share_with_group?: boolean
+          source_content?: string | null
+          source_type?: string
+          status?: string
+          student_id: string
+          subject?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          actual_minutes?: number | null
+          ai_analysis?: Json | null
+          channels?: string[]
+          chapter?: string | null
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: number
+          due_at?: string | null
+          estimated_minutes?: number
+          group_id?: string | null
+          id?: string
+          level?: string | null
+          notes?: string | null
+          priority_score?: number
+          reminder_at?: string | null
+          self_grade?: number | null
+          share_with_group?: boolean
+          source_content?: string | null
+          source_type?: string
+          status?: string
+          student_id?: string
+          subject?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_tasks_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       study_groups: {
         Row: {
           created_at: string
@@ -1550,6 +1669,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      task_reminder_log: {
+        Row: {
+          channel: string
+          id: string
+          sent_at: string
+          student_id: string
+          task_id: string
+          tier: string
+        }
+        Insert: {
+          channel: string
+          id?: string
+          sent_at?: string
+          student_id: string
+          task_id: string
+          tier: string
+        }
+        Update: {
+          channel?: string
+          id?: string
+          sent_at?: string
+          student_id?: string
+          task_id?: string
+          tier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_reminder_log_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "student_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       teacher_availability: {
         Row: {

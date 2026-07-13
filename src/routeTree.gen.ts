@@ -29,6 +29,7 @@ import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCommunityIndexRouteImport } from './routes/_authenticated/community.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
+import { Route as AuthenticatedToolsHomeworkRouteImport } from './routes/_authenticated/tools.homework'
 import { Route as AuthenticatedToolsExercisesRouteImport } from './routes/_authenticated/tools.exercises'
 import { Route as AuthenticatedToolsCountdownRouteImport } from './routes/_authenticated/tools.countdown'
 import { Route as AuthenticatedToolsCalculatorRouteImport } from './routes/_authenticated/tools.calculator'
@@ -39,6 +40,7 @@ import { Route as AuthenticatedCommunityThreadIdRouteImport } from './routes/_au
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin_.moderation'
 import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin_.archive'
+import { Route as ApiPublicHooksTaskRemindersRouteImport } from './routes/api/public/hooks/task-reminders'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
 import { Route as AuthenticatedSessionsBookTeacherIdRouteImport } from './routes/_authenticated/sessions.book.$teacherId'
 import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_authenticated/ai.sheets.$sheetId'
@@ -149,6 +151,12 @@ const ApiChatConversationIdRoute = ApiChatConversationIdRouteImport.update({
   path: '/api/chat/$conversationId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedToolsHomeworkRoute =
+  AuthenticatedToolsHomeworkRouteImport.update({
+    id: '/tools/homework',
+    path: '/tools/homework',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedToolsExercisesRoute =
   AuthenticatedToolsExercisesRouteImport.update({
     id: '/tools/exercises',
@@ -207,6 +215,12 @@ const AuthenticatedAdminArchiveRoute =
     id: '/admin_/archive',
     path: '/admin/archive',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicHooksTaskRemindersRoute =
+  ApiPublicHooksTaskRemindersRouteImport.update({
+    id: '/api/public/hooks/task-reminders',
+    path: '/api/public/hooks/task-reminders',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedTeacherCoursesNewRoute =
   AuthenticatedTeacherCoursesNewRouteImport.update({
@@ -274,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
+  '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/community/': typeof AuthenticatedCommunityIndexRoute
@@ -286,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesByTo {
@@ -311,6 +327,7 @@ export interface FileRoutesByTo {
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
+  '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
@@ -323,6 +340,7 @@ export interface FileRoutesByTo {
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesById {
@@ -351,6 +369,7 @@ export interface FileRoutesById {
   '/_authenticated/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/_authenticated/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/_authenticated/tools/exercises': typeof AuthenticatedToolsExercisesRoute
+  '/_authenticated/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
@@ -363,6 +382,7 @@ export interface FileRoutesById {
   '/_authenticated/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/_authenticated/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/_authenticated/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRouteTypes {
@@ -391,6 +411,7 @@ export interface FileRouteTypes {
     | '/tools/calculator'
     | '/tools/countdown'
     | '/tools/exercises'
+    | '/tools/homework'
     | '/api/chat/$conversationId'
     | '/ai/'
     | '/community/'
@@ -403,6 +424,7 @@ export interface FileRouteTypes {
     | '/ai/sheets/$sheetId'
     | '/sessions/book/$teacherId'
     | '/teacher/courses/new'
+    | '/api/public/hooks/task-reminders'
     | '/teacher/courses/$courseId/chapters'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -428,6 +450,7 @@ export interface FileRouteTypes {
     | '/tools/calculator'
     | '/tools/countdown'
     | '/tools/exercises'
+    | '/tools/homework'
     | '/api/chat/$conversationId'
     | '/ai'
     | '/community'
@@ -440,6 +463,7 @@ export interface FileRouteTypes {
     | '/ai/sheets/$sheetId'
     | '/sessions/book/$teacherId'
     | '/teacher/courses/new'
+    | '/api/public/hooks/task-reminders'
     | '/teacher/courses/$courseId/chapters'
   id:
     | '__root__'
@@ -467,6 +491,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tools/calculator'
     | '/_authenticated/tools/countdown'
     | '/_authenticated/tools/exercises'
+    | '/_authenticated/tools/homework'
     | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
     | '/_authenticated/community/'
@@ -479,6 +504,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ai/sheets/$sheetId'
     | '/_authenticated/sessions/book/$teacherId'
     | '/_authenticated/teacher/courses/new'
+    | '/api/public/hooks/task-reminders'
     | '/_authenticated/teacher/courses/$courseId/chapters'
   fileRoutesById: FileRoutesById
 }
@@ -491,6 +517,7 @@ export interface RootRouteChildren {
   TeachersRoute: typeof TeachersRoute
   SessionsSessionIdRoute: typeof SessionsSessionIdRoute
   ApiChatConversationIdRoute: typeof ApiChatConversationIdRoute
+  ApiPublicHooksTaskRemindersRoute: typeof ApiPublicHooksTaskRemindersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -635,6 +662,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatConversationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tools/homework': {
+      id: '/_authenticated/tools/homework'
+      path: '/tools/homework'
+      fullPath: '/tools/homework'
+      preLoaderRoute: typeof AuthenticatedToolsHomeworkRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tools/exercises': {
       id: '/_authenticated/tools/exercises'
       path: '/tools/exercises'
@@ -704,6 +738,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/archive'
       preLoaderRoute: typeof AuthenticatedAdminArchiveRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/hooks/task-reminders': {
+      id: '/api/public/hooks/task-reminders'
+      path: '/api/public/hooks/task-reminders'
+      fullPath: '/api/public/hooks/task-reminders'
+      preLoaderRoute: typeof ApiPublicHooksTaskRemindersRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/teacher/courses/new': {
       id: '/_authenticated/teacher/courses/new'
@@ -806,6 +847,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedToolsCalculatorRoute: typeof AuthenticatedToolsCalculatorRoute
   AuthenticatedToolsCountdownRoute: typeof AuthenticatedToolsCountdownRoute
   AuthenticatedToolsExercisesRoute: typeof AuthenticatedToolsExercisesRoute
+  AuthenticatedToolsHomeworkRoute: typeof AuthenticatedToolsHomeworkRoute
   AuthenticatedCommunityIndexRoute: typeof AuthenticatedCommunityIndexRoute
   AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
@@ -831,6 +873,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedToolsCalculatorRoute: AuthenticatedToolsCalculatorRoute,
   AuthenticatedToolsCountdownRoute: AuthenticatedToolsCountdownRoute,
   AuthenticatedToolsExercisesRoute: AuthenticatedToolsExercisesRoute,
+  AuthenticatedToolsHomeworkRoute: AuthenticatedToolsHomeworkRoute,
   AuthenticatedCommunityIndexRoute: AuthenticatedCommunityIndexRoute,
   AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
@@ -865,6 +908,7 @@ const rootRouteChildren: RootRouteChildren = {
   TeachersRoute: TeachersRoute,
   SessionsSessionIdRoute: SessionsSessionIdRoute,
   ApiChatConversationIdRoute: ApiChatConversationIdRoute,
+  ApiPublicHooksTaskRemindersRoute: ApiPublicHooksTaskRemindersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

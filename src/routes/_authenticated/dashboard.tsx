@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench, Archive, Flame, Gift, Users, MessageSquare } from "lucide-react";
+import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench, Archive, Flame, Gift, Users, MessageSquare, ListChecks } from "lucide-react";
 import { listMyEnrollments } from "@/lib/course.functions";
 import { listMyBookings } from "@/lib/live-session.functions";
 import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
@@ -74,6 +74,7 @@ function Dashboard() {
   const unread = notifs.filter((n) => !n.read_at).length;
 
   const cards = [
+    { icon: ListChecks, title: "Cahier de textes", desc: "Photo → IA planifie et te rappelle avant l'échéance", to: "/tools/homework" as const },
     { icon: BookOpen, title: "Catalogue de cours", desc: "Trouve un cours vidéo", to: "/courses" as const },
     { icon: Video, title: "Trouver un prof", desc: "Réserve une session live", to: "/teachers" as const },
     { icon: Sparkles, title: "Entraînement IA", desc: "Génère un exercice", to: "/ai" as const },
