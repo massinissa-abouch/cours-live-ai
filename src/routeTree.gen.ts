@@ -21,9 +21,13 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authenticated/tools.index'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
+import { Route as AuthenticatedToolsExercisesRouteImport } from './routes/_authenticated/tools.exercises'
+import { Route as AuthenticatedToolsCountdownRouteImport } from './routes/_authenticated/tools.countdown'
+import { Route as AuthenticatedToolsCalculatorRouteImport } from './routes/_authenticated/tools.calculator'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedLiveSessionIdRouteImport } from './routes/_authenticated/live.$sessionId'
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
@@ -94,6 +98,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedToolsIndexRoute = AuthenticatedToolsIndexRouteImport.update({
+  id: '/tools/',
+  path: '/tools/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTeacherIndexRoute =
   AuthenticatedTeacherIndexRouteImport.update({
     id: '/teacher/',
@@ -110,6 +119,24 @@ const ApiChatConversationIdRoute = ApiChatConversationIdRouteImport.update({
   path: '/api/chat/$conversationId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedToolsExercisesRoute =
+  AuthenticatedToolsExercisesRouteImport.update({
+    id: '/tools/exercises',
+    path: '/tools/exercises',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedToolsCountdownRoute =
+  AuthenticatedToolsCountdownRouteImport.update({
+    id: '/tools/countdown',
+    path: '/tools/countdown',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedToolsCalculatorRoute =
+  AuthenticatedToolsCalculatorRouteImport.update({
+    id: '/tools/calculator',
+    path: '/tools/calculator',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTeacherAvailabilityRoute =
   AuthenticatedTeacherAvailabilityRouteImport.update({
     id: '/teacher/availability',
@@ -184,9 +211,13 @@ export interface FileRoutesByFullPath {
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
+  '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
+  '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
+  '/tools/': typeof AuthenticatedToolsIndexRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -209,9 +240,13 @@ export interface FileRoutesByTo {
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
+  '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
+  '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
+  '/tools': typeof AuthenticatedToolsIndexRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -237,9 +272,13 @@ export interface FileRoutesById {
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/_authenticated/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
+  '/_authenticated/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
+  '/_authenticated/tools/countdown': typeof AuthenticatedToolsCountdownRoute
+  '/_authenticated/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
+  '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
   '/_authenticated/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/_authenticated/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/_authenticated/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -265,9 +304,13 @@ export interface FileRouteTypes {
     | '/ai/sheets'
     | '/live/$sessionId'
     | '/teacher/availability'
+    | '/tools/calculator'
+    | '/tools/countdown'
+    | '/tools/exercises'
     | '/api/chat/$conversationId'
     | '/ai/'
     | '/teacher/'
+    | '/tools/'
     | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
@@ -290,9 +333,13 @@ export interface FileRouteTypes {
     | '/ai/sheets'
     | '/live/$sessionId'
     | '/teacher/availability'
+    | '/tools/calculator'
+    | '/tools/countdown'
+    | '/tools/exercises'
     | '/api/chat/$conversationId'
     | '/ai'
     | '/teacher'
+    | '/tools'
     | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
@@ -317,9 +364,13 @@ export interface FileRouteTypes {
     | '/_authenticated/ai/sheets'
     | '/_authenticated/live/$sessionId'
     | '/_authenticated/teacher/availability'
+    | '/_authenticated/tools/calculator'
+    | '/_authenticated/tools/countdown'
+    | '/_authenticated/tools/exercises'
     | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
+    | '/_authenticated/tools/'
     | '/_authenticated/ai/c/$conversationId'
     | '/_authenticated/ai/exam/$examId'
     | '/_authenticated/ai/exam/new'
@@ -426,6 +477,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tools/': {
+      id: '/_authenticated/tools/'
+      path: '/tools'
+      fullPath: '/tools/'
+      preLoaderRoute: typeof AuthenticatedToolsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/teacher/': {
       id: '/_authenticated/teacher/'
       path: '/teacher'
@@ -446,6 +504,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat/$conversationId'
       preLoaderRoute: typeof ApiChatConversationIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tools/exercises': {
+      id: '/_authenticated/tools/exercises'
+      path: '/tools/exercises'
+      fullPath: '/tools/exercises'
+      preLoaderRoute: typeof AuthenticatedToolsExercisesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tools/countdown': {
+      id: '/_authenticated/tools/countdown'
+      path: '/tools/countdown'
+      fullPath: '/tools/countdown'
+      preLoaderRoute: typeof AuthenticatedToolsCountdownRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tools/calculator': {
+      id: '/_authenticated/tools/calculator'
+      path: '/tools/calculator'
+      fullPath: '/tools/calculator'
+      preLoaderRoute: typeof AuthenticatedToolsCalculatorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/teacher/availability': {
       id: '/_authenticated/teacher/availability'
@@ -560,7 +639,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedLiveSessionIdRoute: typeof AuthenticatedLiveSessionIdRoute
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
+  AuthenticatedToolsCalculatorRoute: typeof AuthenticatedToolsCalculatorRoute
+  AuthenticatedToolsCountdownRoute: typeof AuthenticatedToolsCountdownRoute
+  AuthenticatedToolsExercisesRoute: typeof AuthenticatedToolsExercisesRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
+  AuthenticatedToolsIndexRoute: typeof AuthenticatedToolsIndexRoute
   AuthenticatedSessionsBookTeacherIdRoute: typeof AuthenticatedSessionsBookTeacherIdRoute
   AuthenticatedTeacherCoursesNewRoute: typeof AuthenticatedTeacherCoursesNewRoute
   AuthenticatedTeacherCoursesCourseIdChaptersRoute: typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
@@ -573,7 +656,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedLiveSessionIdRoute: AuthenticatedLiveSessionIdRoute,
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
+  AuthenticatedToolsCalculatorRoute: AuthenticatedToolsCalculatorRoute,
+  AuthenticatedToolsCountdownRoute: AuthenticatedToolsCountdownRoute,
+  AuthenticatedToolsExercisesRoute: AuthenticatedToolsExercisesRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
+  AuthenticatedToolsIndexRoute: AuthenticatedToolsIndexRoute,
   AuthenticatedSessionsBookTeacherIdRoute:
     AuthenticatedSessionsBookTeacherIdRoute,
   AuthenticatedTeacherCoursesNewRoute: AuthenticatedTeacherCoursesNewRoute,
