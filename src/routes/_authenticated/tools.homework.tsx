@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowLeft, Bell, BellOff, Camera, CheckCircle2, Clock, Flame, Loader2,
+  ArrowLeft, Bell, Camera, CheckCircle2, Clock, Flame, Loader2,
   Play, Plus, Sparkles, Trash2, X, AlarmClock, Zap, ListChecks, Users, Info,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -657,6 +657,3 @@ function FocusDialog({ task, onClose, onPatched }: { task: Task; onClose: () => 
     </div>
   );
 }
-
-// Silence unused-import warnings for icons used conditionally
-void BellOff;
