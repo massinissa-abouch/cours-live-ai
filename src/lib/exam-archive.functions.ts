@@ -2,10 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function requireAdmin(ctx: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }; userId: string }) {
-  const { data, error } = await ctx.supabase.rpc("has_role", { _user_id: ctx.userId, _role: "admin" });
+type AuthCtx = Parameters<Parameters<ReturnType<typeof createServerFn>["middleware"]>[0][number]["server"]>[0]["context"] extends infer _ ? never : never;
+
+async function requireAdmin(context: { supabase: import("@supabase/supabase-js").SupabaseClient<import("@/integrations/supabase/types").Database>; userId: string }) {
+  const { data, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
   if (error || !data) throw new Error("Réservé aux administrateurs.");
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type _Unused = AuthCtx;
 
 const EntryInput = z.object({
   id: z.string().uuid().optional(),
