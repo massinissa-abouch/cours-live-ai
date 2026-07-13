@@ -351,7 +351,7 @@ function NewTaskDialog({ groups, onClose, onCreated }: { groups: Group[]; onClos
   async function runAnalyze() {
     setAnalyzing(true);
     try {
-      const payload: Parameters<typeof analyze>[0]["data"] = {};
+      const payload: { title?: string; sourceText?: string; imageDataUrl?: string; level?: string } = {};
       if (mode === "photo" && file) payload.imageDataUrl = await toDataUrl(file);
       if (mode === "text" && source.trim()) payload.sourceText = source.trim();
       if (mode === "manual" && form.title) payload.title = form.title;

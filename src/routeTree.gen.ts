@@ -29,6 +29,7 @@ import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCommunityIndexRouteImport } from './routes/_authenticated/community.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
+import { Route as AuthenticatedToolsHomeworkRouteImport } from './routes/_authenticated/tools.homework'
 import { Route as AuthenticatedToolsExercisesRouteImport } from './routes/_authenticated/tools.exercises'
 import { Route as AuthenticatedToolsCountdownRouteImport } from './routes/_authenticated/tools.countdown'
 import { Route as AuthenticatedToolsCalculatorRouteImport } from './routes/_authenticated/tools.calculator'
@@ -150,6 +151,12 @@ const ApiChatConversationIdRoute = ApiChatConversationIdRouteImport.update({
   path: '/api/chat/$conversationId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedToolsHomeworkRoute =
+  AuthenticatedToolsHomeworkRouteImport.update({
+    id: '/tools/homework',
+    path: '/tools/homework',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedToolsExercisesRoute =
   AuthenticatedToolsExercisesRouteImport.update({
     id: '/tools/exercises',
@@ -281,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
+  '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/community/': typeof AuthenticatedCommunityIndexRoute
@@ -319,6 +327,7 @@ export interface FileRoutesByTo {
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
+  '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
@@ -360,6 +369,7 @@ export interface FileRoutesById {
   '/_authenticated/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/_authenticated/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/_authenticated/tools/exercises': typeof AuthenticatedToolsExercisesRoute
+  '/_authenticated/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
@@ -401,6 +411,7 @@ export interface FileRouteTypes {
     | '/tools/calculator'
     | '/tools/countdown'
     | '/tools/exercises'
+    | '/tools/homework'
     | '/api/chat/$conversationId'
     | '/ai/'
     | '/community/'
@@ -439,6 +450,7 @@ export interface FileRouteTypes {
     | '/tools/calculator'
     | '/tools/countdown'
     | '/tools/exercises'
+    | '/tools/homework'
     | '/api/chat/$conversationId'
     | '/ai'
     | '/community'
@@ -479,6 +491,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tools/calculator'
     | '/_authenticated/tools/countdown'
     | '/_authenticated/tools/exercises'
+    | '/_authenticated/tools/homework'
     | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
     | '/_authenticated/community/'
@@ -648,6 +661,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat/$conversationId'
       preLoaderRoute: typeof ApiChatConversationIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tools/homework': {
+      id: '/_authenticated/tools/homework'
+      path: '/tools/homework'
+      fullPath: '/tools/homework'
+      preLoaderRoute: typeof AuthenticatedToolsHomeworkRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tools/exercises': {
       id: '/_authenticated/tools/exercises'
@@ -827,6 +847,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedToolsCalculatorRoute: typeof AuthenticatedToolsCalculatorRoute
   AuthenticatedToolsCountdownRoute: typeof AuthenticatedToolsCountdownRoute
   AuthenticatedToolsExercisesRoute: typeof AuthenticatedToolsExercisesRoute
+  AuthenticatedToolsHomeworkRoute: typeof AuthenticatedToolsHomeworkRoute
   AuthenticatedCommunityIndexRoute: typeof AuthenticatedCommunityIndexRoute
   AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
@@ -852,6 +873,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedToolsCalculatorRoute: AuthenticatedToolsCalculatorRoute,
   AuthenticatedToolsCountdownRoute: AuthenticatedToolsCountdownRoute,
   AuthenticatedToolsExercisesRoute: AuthenticatedToolsExercisesRoute,
+  AuthenticatedToolsHomeworkRoute: AuthenticatedToolsHomeworkRoute,
   AuthenticatedCommunityIndexRoute: AuthenticatedCommunityIndexRoute,
   AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
