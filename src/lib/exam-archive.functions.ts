@@ -2,15 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-type AuthCtx = Parameters<Parameters<ReturnType<typeof createServerFn>["middleware"]>[0][number]["server"]>[0]["context"] extends infer _ ? never : never;
-
-async function requireAdmin(context: { supabase: import("@supabase/supabase-js").SupabaseClient<import("@/integrations/supabase/types").Database>; userId: string }) {
-  const { data, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-  if (error || !data) throw new Error("Réservé aux administrateurs.");
-}
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type _Unused = AuthCtx;
-
 const EntryInput = z.object({
   id: z.string().uuid().optional(),
   exam_type: z.enum(["bem", "bac"]),
@@ -26,7 +17,8 @@ export const saveArchiveEntry = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => EntryInput.parse(i))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    const { data: ok } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!ok) throw new Error("Réservé aux administrateurs.");
     const payload = {
       exam_type: data.exam_type,
       year: data.year,
@@ -51,7 +43,8 @@ export const deleteArchiveEntry = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    const { data: ok } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!ok) throw new Error("Réservé aux administrateurs.");
     const { data: row } = await context.supabase
       .from("exam_archive").select("pdf_url,correction_url").eq("id", data.id).maybeSingle();
     if (row) {
@@ -67,7 +60,8 @@ export const signArchiveUpload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ ext: z.string().max(8) }).parse(i))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    const { data: ok } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!ok) throw new Error("Réservé aux administrateurs.");
     const clean = data.ext.replace(/[^a-z0-9]/gi, "") || "pdf";
     const path = `${new Date().getFullYear()}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${clean}`;
     const { data: sig, error } = await context.supabase.storage
