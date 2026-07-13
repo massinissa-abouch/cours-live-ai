@@ -37,6 +37,7 @@ import { Route as AuthenticatedLiveSessionIdRouteImport } from './routes/_authen
 import { Route as AuthenticatedGroupsGroupIdRouteImport } from './routes/_authenticated/groups.$groupId'
 import { Route as AuthenticatedCommunityThreadIdRouteImport } from './routes/_authenticated/community.$threadId'
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
+import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin_.moderation'
 import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin_.archive'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
 import { Route as AuthenticatedSessionsBookTeacherIdRouteImport } from './routes/_authenticated/sessions.book.$teacherId'
@@ -195,6 +196,12 @@ const AuthenticatedAiSheetsRoute = AuthenticatedAiSheetsRouteImport.update({
   path: '/sheets',
   getParentRoute: () => AuthenticatedAiRoute,
 } as any)
+const AuthenticatedAdminModerationRoute =
+  AuthenticatedAdminModerationRouteImport.update({
+    id: '/admin_/moderation',
+    path: '/admin/moderation',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminArchiveRoute =
   AuthenticatedAdminArchiveRouteImport.update({
     id: '/admin_/archive',
@@ -258,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
+  '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/community/$threadId': typeof AuthenticatedCommunityThreadIdRoute
   '/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
@@ -294,6 +302,7 @@ export interface FileRoutesByTo {
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
+  '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/community/$threadId': typeof AuthenticatedCommunityThreadIdRoute
   '/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
@@ -333,6 +342,7 @@ export interface FileRoutesById {
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/_authenticated/admin_/archive': typeof AuthenticatedAdminArchiveRoute
+  '/_authenticated/admin_/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/_authenticated/community/$threadId': typeof AuthenticatedCommunityThreadIdRoute
   '/_authenticated/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/courses/$courseId'
     | '/sessions/$sessionId'
     | '/admin/archive'
+    | '/admin/moderation'
     | '/ai/sheets'
     | '/community/$threadId'
     | '/groups/$groupId'
@@ -408,6 +419,7 @@ export interface FileRouteTypes {
     | '/courses/$courseId'
     | '/sessions/$sessionId'
     | '/admin/archive'
+    | '/admin/moderation'
     | '/ai/sheets'
     | '/community/$threadId'
     | '/groups/$groupId'
@@ -446,6 +458,7 @@ export interface FileRouteTypes {
     | '/courses/$courseId'
     | '/sessions/$sessionId'
     | '/_authenticated/admin_/archive'
+    | '/_authenticated/admin_/moderation'
     | '/_authenticated/ai/sheets'
     | '/_authenticated/community/$threadId'
     | '/_authenticated/groups/$groupId'
@@ -678,6 +691,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiSheetsRouteImport
       parentRoute: typeof AuthenticatedAiRoute
     }
+    '/_authenticated/admin_/moderation': {
+      id: '/_authenticated/admin_/moderation'
+      path: '/admin/moderation'
+      fullPath: '/admin/moderation'
+      preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/archive': {
       id: '/_authenticated/admin_/archive'
       path: '/admin/archive'
@@ -778,6 +798,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedAdminArchiveRoute: typeof AuthenticatedAdminArchiveRoute
+  AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
   AuthenticatedCommunityThreadIdRoute: typeof AuthenticatedCommunityThreadIdRoute
   AuthenticatedGroupsGroupIdRoute: typeof AuthenticatedGroupsGroupIdRoute
   AuthenticatedLiveSessionIdRoute: typeof AuthenticatedLiveSessionIdRoute
@@ -802,6 +823,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInviteRoute: AuthenticatedInviteRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedAdminArchiveRoute: AuthenticatedAdminArchiveRoute,
+  AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
   AuthenticatedCommunityThreadIdRoute: AuthenticatedCommunityThreadIdRoute,
   AuthenticatedGroupsGroupIdRoute: AuthenticatedGroupsGroupIdRoute,
   AuthenticatedLiveSessionIdRoute: AuthenticatedLiveSessionIdRoute,

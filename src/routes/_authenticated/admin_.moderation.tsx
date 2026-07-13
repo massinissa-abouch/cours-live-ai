@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, ShieldAlert, EyeOff, X, Trash2, Ban } from "lucide-react";
 import { listReports, resolveReport, banUser } from "@/lib/community.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/moderation")({
+export const Route = createFileRoute("/_authenticated/admin_/moderation")({
   component: ModerationPage,
 });
 
