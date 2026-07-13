@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GraduationCap, Users, Sparkles, Upload, ShieldCheck } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { redeemReferralCode } from "@/lib/growth.functions";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
@@ -44,6 +46,7 @@ const LEVELS: { value: Level; label: string; group: string }[] = [
 function Onboarding() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
+  const redeem = useServerFn(redeemReferralCode);
   const [role, setRole] = useState<Role>("student");
   const [level, setLevel] = useState<Level>("lycee_3_sciences");
   const [exam, setExam] = useState<"none" | "bem" | "bac">("bac");
@@ -84,6 +87,15 @@ function Onboarding() {
       await supabase
         .from("student_profiles")
         .upsert({ user_id: user.id, school_level: level, exam_target: exam });
+
+      // Referral code capture
+      if (typeof window !== "undefined") {
+        const ref = window.localStorage.getItem("ostadi_ref");
+        if (ref) {
+          try { await redeem({ data: { code: ref } }); } catch { /* ignore */ }
+          window.localStorage.removeItem("ostadi_ref");
+        }
+      }
 
       if (role === "teacher") {
         const idPath = idDoc ? await uploadDoc(idDoc, "id") : undefined;

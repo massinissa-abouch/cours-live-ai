@@ -1096,6 +1096,8 @@ export type Database = {
           created_at: string
           credits: number
           exam_target: Database["public"]["Enums"]["exam_target"]
+          perk_unlocked_until: string | null
+          referral_code: string | null
           school_level: Database["public"]["Enums"]["school_level"] | null
           streak_days: number
           updated_at: string
@@ -1105,6 +1107,8 @@ export type Database = {
           created_at?: string
           credits?: number
           exam_target?: Database["public"]["Enums"]["exam_target"]
+          perk_unlocked_until?: string | null
+          referral_code?: string | null
           school_level?: Database["public"]["Enums"]["school_level"] | null
           streak_days?: number
           updated_at?: string
@@ -1114,6 +1118,8 @@ export type Database = {
           created_at?: string
           credits?: number
           exam_target?: Database["public"]["Enums"]["exam_target"]
+          perk_unlocked_until?: string | null
+          referral_code?: string | null
           school_level?: Database["public"]["Enums"]["school_level"] | null
           streak_days?: number
           updated_at?: string
@@ -1279,6 +1285,17 @@ export type Database = {
       is_parent_of: {
         Args: { _parent: string; _student: string }
         Returns: boolean
+      }
+      ping_streak: {
+        Args: { _user: string }
+        Returns: {
+          last_practice_date: string
+          streak_days: number
+        }[]
+      }
+      redeem_referral_code: {
+        Args: { _code: string; _new_user: string }
+        Returns: undefined
       }
     }
     Enums: {

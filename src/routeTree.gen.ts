@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SessionsSessionIdRouteImport } from './routes/sessions.$sessionId'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedArchiveRouteImport } from './routes/_authenticated/archive'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
@@ -83,6 +84,11 @@ const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInviteRoute = AuthenticatedInviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/ai': typeof AuthenticatedAiRouteWithChildren
   '/archive': typeof AuthenticatedArchiveRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/invite': typeof AuthenticatedInviteRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/archive': typeof AuthenticatedArchiveRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/invite': typeof AuthenticatedInviteRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/_authenticated/ai': typeof AuthenticatedAiRouteWithChildren
   '/_authenticated/archive': typeof AuthenticatedArchiveRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/invite': typeof AuthenticatedInviteRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/ai'
     | '/archive'
     | '/dashboard'
+    | '/invite'
     | '/onboarding'
     | '/courses/$courseId'
     | '/sessions/$sessionId'
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/archive'
     | '/dashboard'
+    | '/invite'
     | '/onboarding'
     | '/courses/$courseId'
     | '/sessions/$sessionId'
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ai'
     | '/_authenticated/archive'
     | '/_authenticated/dashboard'
+    | '/_authenticated/invite'
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
     | '/sessions/$sessionId'
@@ -479,6 +491,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/invite': {
+      id: '/_authenticated/invite'
+      path: '/invite'
+      fullPath: '/invite'
+      preLoaderRoute: typeof AuthenticatedInviteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -676,6 +695,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiRoute: typeof AuthenticatedAiRouteWithChildren
   AuthenticatedArchiveRoute: typeof AuthenticatedArchiveRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedAdminArchiveRoute: typeof AuthenticatedAdminArchiveRoute
   AuthenticatedLiveSessionIdRoute: typeof AuthenticatedLiveSessionIdRoute
@@ -695,6 +715,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiRoute: AuthenticatedAiRouteWithChildren,
   AuthenticatedArchiveRoute: AuthenticatedArchiveRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedInviteRoute: AuthenticatedInviteRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedAdminArchiveRoute: AuthenticatedAdminArchiveRoute,
   AuthenticatedLiveSessionIdRoute: AuthenticatedLiveSessionIdRoute,

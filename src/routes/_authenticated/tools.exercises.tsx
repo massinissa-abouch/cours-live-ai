@@ -6,6 +6,8 @@ import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { generateAiExercise, gradeAiAnswer } from "@/lib/ai.functions";
+import { pingStreak } from "@/lib/growth.functions";
+import { ShareResultCard } from "@/components/ShareResultCard";
 
 export const Route = createFileRoute("/_authenticated/tools/exercises")({
   component: ExercisesPage,
@@ -44,6 +46,8 @@ function ExercisesPage() {
 
   const generate = useServerFn(generateAiExercise);
   const grade = useServerFn(gradeAiAnswer);
+  const ping = useServerFn(pingStreak);
+  const [streakDays, setStreakDays] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
@@ -72,6 +76,7 @@ function ExercisesPage() {
     try {
       const res = await grade({ data: { exerciseMarkdown: exercise, studentAnswer: answer } });
       setFeedback(res.feedback);
+      try { const s = await ping(); setStreakDays(s.streakDays); } catch { /* ignore */ }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erreur");
     } finally {
@@ -159,6 +164,18 @@ function ExercisesPage() {
               <ReactMarkdown>{feedback}</ReactMarkdown>
             </div>
           </article>
+        )}
+
+        {feedback && (
+          <div className="mt-6">
+            <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Partage ton progrès</h3>
+            <ShareResultCard
+              title={`Exercice ${subject} terminé`}
+              score="✓"
+              subtitle={chapter ? `Chapitre : ${chapter}` : `Niveau ${LEVELS.find((l) => l.value === level)?.label ?? level}`}
+              streakDays={streakDays}
+            />
+          </div>
         )}
       </main>
     </div>

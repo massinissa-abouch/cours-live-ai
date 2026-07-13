@@ -2,11 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench, Archive } from "lucide-react";
+import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench, Archive, Flame, Gift } from "lucide-react";
 import { listMyEnrollments } from "@/lib/course.functions";
 import { listMyBookings } from "@/lib/live-session.functions";
 import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
 import { getAiCostSummary } from "@/lib/ai-cost.functions";
+import { pingStreak, getGrowthStatus } from "@/lib/growth.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -22,11 +23,14 @@ function Dashboard() {
   const [isTeacher, setIsTeacher] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [aiCost, setAiCost] = useState<Awaited<ReturnType<typeof getAiCostSummary>> | null>(null);
+  const [growth, setGrowth] = useState<Awaited<ReturnType<typeof getGrowthStatus>> | null>(null);
   const loadEnroll = useServerFn(listMyEnrollments);
   const loadBooks = useServerFn(listMyBookings);
   const loadNotif = useServerFn(listMyNotifications);
   const markRead = useServerFn(markNotificationRead);
   const loadCost = useServerFn(getAiCostSummary);
+  const ping = useServerFn(pingStreak);
+  const loadGrowth = useServerFn(getGrowthStatus);
   const [enrollments, setEnrollments] = useState<EnrollmentRow[]>([]);
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [notifs, setNotifs] = useState<Notif[]>([]);
@@ -49,8 +53,12 @@ function Dashboard() {
       if (admin) {
         try { setAiCost(await loadCost()); } catch { /* ignore */ }
       }
+      try {
+        await ping();
+        setGrowth(await loadGrowth());
+      } catch { /* ignore */ }
     })();
-  }, [user.id, navigate, loadEnroll, loadBooks, loadNotif, loadCost]);
+  }, [user.id, navigate, loadEnroll, loadBooks, loadNotif, loadCost, ping, loadGrowth]);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -115,6 +123,23 @@ function Dashboard() {
           Bonjour {user.user_metadata?.full_name ?? user.email} 👋
         </h1>
         <p className="mt-2 text-muted-foreground">Que veux-tu faire aujourd'hui ?</p>
+
+        {growth && (
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/40 bg-orange-500/10 px-4 py-2 text-sm font-semibold text-orange-600 dark:text-orange-300">
+              <Flame className="h-4 w-4" />
+              {growth.streakDays > 0 ? `${growth.streakDays} jour${growth.streakDays > 1 ? "s" : ""} de suite` : "Commence ton streak aujourd'hui !"}
+            </div>
+            {growth.perkActive && (
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-300">
+                <Sparkles className="h-3.5 w-3.5" /> Accès illimité actif
+              </div>
+            )}
+            <Link to="/invite" className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/15">
+              <Gift className="h-3.5 w-3.5" /> Invite 3 amis → +7 jours ({growth.acceptedCount}/3)
+            </Link>
+          </div>
+        )}
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {cards.map((c) => (

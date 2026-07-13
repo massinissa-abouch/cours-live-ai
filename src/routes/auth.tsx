@@ -4,20 +4,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 
-type Search = { mode?: "signin" | "signup"; role?: "student" | "teacher" | "parent" };
+type Search = { mode?: "signin" | "signup"; role?: "student" | "teacher" | "parent"; ref?: string };
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     mode: s.mode === "signup" ? "signup" : "signin",
     role: s.role === "teacher" || s.role === "parent" ? s.role : "student",
+    ref: typeof s.ref === "string" && s.ref.length >= 4 && s.ref.length <= 32 ? s.ref : undefined,
   }),
   component: AuthPage,
 });
 
 function AuthPage() {
-  const { mode: initialMode } = Route.useSearch();
+  const { mode: initialMode, ref } = Route.useSearch();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">(initialMode ?? "signin");
+  const [mode, setMode] = useState<"signin" | "signup">(ref ? "signup" : (initialMode ?? "signin"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -25,10 +26,13 @@ function AuthPage() {
   const [awaitingConfirm, setAwaitingConfirm] = useState(false);
 
   useEffect(() => {
+    if (ref && typeof window !== "undefined") {
+      window.localStorage.setItem("ostadi_ref", ref);
+    }
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard" });
     });
-  }, [navigate]);
+  }, [navigate, ref]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
