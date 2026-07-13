@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp } from "lucide-react";
+import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench } from "lucide-react";
 import { listMyEnrollments } from "@/lib/course.functions";
 import { listMyBookings } from "@/lib/live-session.functions";
 import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
@@ -69,6 +69,7 @@ function Dashboard() {
     { icon: BookOpen, title: "Catalogue de cours", desc: "Trouve un cours vidéo", to: "/courses" as const },
     { icon: Video, title: "Trouver un prof", desc: "Réserve une session live", to: "/teachers" as const },
     { icon: Sparkles, title: "Entraînement IA", desc: "Génère un exercice", to: "/ai" as const },
+    { icon: Wrench, title: "Outils élève", desc: "Moyenne, compte à rebours, banque d'exercices", to: "/tools" as const },
   ];
 
   return (
@@ -114,7 +115,7 @@ function Dashboard() {
         </h1>
         <p className="mt-2 text-muted-foreground">Que veux-tu faire aujourd'hui ?</p>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           {cards.map((c) => (
             <Link
               key={c.title} to={c.to}
