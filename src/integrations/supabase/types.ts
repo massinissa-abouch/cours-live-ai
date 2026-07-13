@@ -584,6 +584,231 @@ export type Database = {
         }
         Relationships: []
       }
+      group_events: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          event_at: string
+          group_id: string
+          id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          event_at: string
+          group_id: string
+          id?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          event_at?: string
+          group_id?: string
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_events_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_exam_alerts: {
+        Row: {
+          chapters: string[]
+          checklist: Json
+          created_at: string
+          created_by: string
+          exam_date: string
+          group_id: string
+          id: string
+          quiz: Json
+          subject: string
+        }
+        Insert: {
+          chapters?: string[]
+          checklist?: Json
+          created_at?: string
+          created_by: string
+          exam_date: string
+          group_id: string
+          id?: string
+          quiz?: Json
+          subject: string
+        }
+        Update: {
+          chapters?: string[]
+          checklist?: Json
+          created_at?: string
+          created_by?: string
+          exam_date?: string
+          group_id?: string
+          id?: string
+          quiz?: Json
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_exam_alerts_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          role: Database["public"]["Enums"]["group_member_role"]
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["group_member_role"]
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["group_member_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_messages: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          group_id: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          group_id: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          group_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_pomodoro_sessions: {
+        Row: {
+          created_at: string
+          ends_at: string
+          group_id: string
+          id: string
+          phase: string
+          started_at: string
+          started_by: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          group_id: string
+          id?: string
+          phase: string
+          started_at?: string
+          started_by: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          group_id?: string
+          id?: string
+          phase?: string
+          started_at?: string
+          started_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_pomodoro_sessions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_resources: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          mime_type: string | null
+          size_bytes: number | null
+          storage_path: string
+          title: string
+          uploader_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path: string
+          title: string
+          uploader_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path?: string
+          title?: string
+          uploader_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_resources_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       live_sessions: {
         Row: {
           allow_recording: boolean
@@ -1127,6 +1352,45 @@ export type Database = {
         }
         Relationships: []
       }
+      study_groups: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          invite_code: string
+          level: string
+          max_members: number
+          name: string
+          owner_id: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invite_code: string
+          level: string
+          max_members?: number
+          name: string
+          owner_id: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          level?: string
+          max_members?: number
+          name?: string
+          owner_id?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       teacher_availability: {
         Row: {
           created_at: string
@@ -1282,6 +1546,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_group_member: {
+        Args: { _group: string; _user: string }
+        Returns: boolean
+      }
+      is_group_owner: {
+        Args: { _group: string; _user: string }
+        Returns: boolean
+      }
       is_parent_of: {
         Args: { _parent: string; _student: string }
         Returns: boolean
@@ -1306,6 +1578,7 @@ export type Database = {
       course_status: "draft" | "published" | "archived"
       earning_status: "pending" | "released" | "refunded"
       exam_target: "none" | "bem" | "bac"
+      group_member_role: "owner" | "member"
       item_type: "course" | "session"
       language_code: "fr" | "ar"
       link_status: "pending" | "accepted" | "rejected"
@@ -1472,6 +1745,7 @@ export const Constants = {
       course_status: ["draft", "published", "archived"],
       earning_status: ["pending", "released", "refunded"],
       exam_target: ["none", "bem", "bac"],
+      group_member_role: ["owner", "member"],
       item_type: ["course", "session"],
       language_code: ["fr", "ar"],
       link_status: ["pending", "accepted", "rejected"],
