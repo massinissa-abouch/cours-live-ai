@@ -53,6 +53,9 @@ function AdminPage() {
           <Link to="/admin/archive" className="rounded-lg border border-border bg-card px-3 py-1.5 hover:border-primary/50">
             📚 Gérer l'archive Bac & BEM
           </Link>
+          <Link to="/admin/moderation" className="rounded-lg border border-border bg-card px-3 py-1.5 hover:border-primary/50">
+            🛡️ Modération communauté
+          </Link>
         </div>
       </div>
 
