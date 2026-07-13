@@ -136,6 +136,61 @@ function Pillars() {
 }
 
 function HowItWorks() {
+  return _HowItWorks();
+}
+
+function MoreFeatures() {
+  const items = [
+    {
+      icon: UsersRound,
+      title: "Groupes de révision",
+      body: "Crée un groupe privé avec tes camarades : chat, ressources, Pomodoro synchro et alertes contrôle.",
+      href: "/auth" as const,
+    },
+    {
+      icon: MessagesSquare,
+      title: "Communauté publique",
+      body: "Pose tes questions par matière et niveau, entraide modérée entre élèves algériens.",
+      href: "/auth" as const,
+    },
+    {
+      icon: Archive,
+      title: "Archive BAC & BEM",
+      body: "Sujets d'examens officiels des années précédentes, avec corrigés — filtrés par filière.",
+      href: "/auth" as const,
+    },
+    {
+      icon: Wrench,
+      title: "Outils élève",
+      body: "Calculatrice scientifique, compte à rebours examens, générateur d'exercices — tout en un.",
+      href: "/auth" as const,
+    },
+  ] as const;
+  return (
+    <section className="mx-auto max-w-6xl px-4 pb-20">
+      <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Et bien plus pour réussir</h2>
+      <p className="mt-2 text-sm text-muted-foreground">Tout ce dont tu as besoin pour bosser sérieusement, gratuit à l'inscription.</p>
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {items.map((it) => (
+          <Link
+            key={it.title}
+            to={it.href}
+            search={{ mode: "signup" }}
+            className="group rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
+          >
+            <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl bg-secondary text-primary">
+              <it.icon className="h-5 w-5" />
+            </div>
+            <h3 className="text-base font-semibold">{it.title}</h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">{it.body}</p>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function _HowItWorks() {
   const steps = [
     { n: 1, t: "Choisis ton niveau", d: "Du primaire à l'université, filière incluse." },
     { n: 2, t: "Apprends", d: "Vidéos, live, ou entraînement IA — au choix." },
