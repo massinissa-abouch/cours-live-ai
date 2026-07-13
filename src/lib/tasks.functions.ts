@@ -112,7 +112,7 @@ export const createTask = createServerFn({ method: "POST" })
         reminder_at: data.reminder_at ?? null,
         source_type: data.source_type,
         source_content: data.source_content ?? null,
-        ai_analysis: data.ai_analysis ?? null,
+        ai_analysis: (data.ai_analysis ?? null) as never,
         group_id: data.group_id ?? null,
         share_with_group: data.share_with_group && !!data.group_id,
         channels: data.channels,
@@ -159,13 +159,11 @@ export const updateTask = createServerFn({ method: "POST" })
     }),
   }).parse(i))
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = { ...data.patch };
-    if (patch.status === "done" && patch.completed_at === undefined) {
-      patch.completed_at = new Date().toISOString();
-    }
+    const patch = { ...data.patch } as Record<string, unknown>;
+    if (patch.status === "done") patch.completed_at = new Date().toISOString();
     const { data: row, error } = await context.supabase
       .from("student_tasks")
-      .update(patch)
+      .update(patch as never)
       .eq("id", data.id)
       .eq("student_id", context.userId)
       .select("*")
