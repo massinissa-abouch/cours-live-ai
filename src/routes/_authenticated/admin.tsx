@@ -49,6 +49,11 @@ function AdminPage() {
         <p className="text-sm text-muted-foreground">
           Période : mois en cours (depuis le {new Date(data.periodStart).toLocaleDateString("fr-FR")}).
         </p>
+        <div className="mt-3 flex flex-wrap gap-2 text-sm">
+          <Link to="/admin/archive" className="rounded-lg border border-border bg-card px-3 py-1.5 hover:border-primary/50">
+            📚 Gérer l'archive Bac & BEM
+          </Link>
+        </div>
       </div>
 
       {data.overAlert && (

@@ -497,6 +497,48 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_archive: {
+        Row: {
+          correction_url: string | null
+          created_at: string
+          exam_type: Database["public"]["Enums"]["exam_target"]
+          filiere: string | null
+          id: string
+          pdf_url: string
+          subject: string
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+          year: number
+        }
+        Insert: {
+          correction_url?: string | null
+          created_at?: string
+          exam_type: Database["public"]["Enums"]["exam_target"]
+          filiere?: string | null
+          id?: string
+          pdf_url: string
+          subject: string
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+          year: number
+        }
+        Update: {
+          correction_url?: string | null
+          created_at?: string
+          exam_type?: Database["public"]["Enums"]["exam_target"]
+          filiere?: string | null
+          id?: string
+          pdf_url?: string
+          subject?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
       exam_countdowns: {
         Row: {
           exam: Database["public"]["Enums"]["exam_target"]
