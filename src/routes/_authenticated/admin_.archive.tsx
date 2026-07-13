@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { saveArchiveEntry, deleteArchiveEntry, signArchiveUpload } from "@/lib/exam-archive.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/archive")({
+export const Route = createFileRoute("/_authenticated/admin_/archive")({
   component: AdminArchivePage,
 });
 

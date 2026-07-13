@@ -32,7 +32,7 @@ import { Route as AuthenticatedToolsCalculatorRouteImport } from './routes/_auth
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedLiveSessionIdRouteImport } from './routes/_authenticated/live.$sessionId'
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
-import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin.archive'
+import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin_.archive'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
 import { Route as AuthenticatedSessionsBookTeacherIdRouteImport } from './routes/_authenticated/sessions.book.$teacherId'
 import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_authenticated/ai.sheets.$sheetId'
@@ -163,9 +163,9 @@ const AuthenticatedAiSheetsRoute = AuthenticatedAiSheetsRouteImport.update({
 } as any)
 const AuthenticatedAdminArchiveRoute =
   AuthenticatedAdminArchiveRouteImport.update({
-    id: '/archive',
-    path: '/archive',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/admin_/archive',
+    path: '/admin/archive',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedTeacherCoursesNewRoute =
   AuthenticatedTeacherCoursesNewRouteImport.update({
@@ -215,7 +215,7 @@ export interface FileRoutesByFullPath {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
   '/ai': typeof AuthenticatedAiRouteWithChildren
   '/archive': typeof AuthenticatedArchiveRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -247,7 +247,7 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
   '/archive': typeof AuthenticatedArchiveRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -280,14 +280,14 @@ export interface FileRoutesById {
   '/courses': typeof CoursesRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teachers': typeof TeachersRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/ai': typeof AuthenticatedAiRouteWithChildren
   '/_authenticated/archive': typeof AuthenticatedArchiveRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
-  '/_authenticated/admin/archive': typeof AuthenticatedAdminArchiveRoute
+  '/_authenticated/admin_/archive': typeof AuthenticatedAdminArchiveRoute
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
   '/_authenticated/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
@@ -385,7 +385,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
     | '/sessions/$sessionId'
-    | '/_authenticated/admin/archive'
+    | '/_authenticated/admin_/archive'
     | '/_authenticated/ai/sheets'
     | '/_authenticated/live/$sessionId'
     | '/_authenticated/teacher/availability'
@@ -579,12 +579,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiSheetsRouteImport
       parentRoute: typeof AuthenticatedAiRoute
     }
-    '/_authenticated/admin/archive': {
-      id: '/_authenticated/admin/archive'
-      path: '/archive'
+    '/_authenticated/admin_/archive': {
+      id: '/_authenticated/admin_/archive'
+      path: '/admin/archive'
       fullPath: '/admin/archive'
       preLoaderRoute: typeof AuthenticatedAdminArchiveRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/teacher/courses/new': {
       id: '/_authenticated/teacher/courses/new'
@@ -638,17 +638,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminArchiveRoute: typeof AuthenticatedAdminArchiveRoute
-}
-
-const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminArchiveRoute: AuthenticatedAdminArchiveRoute,
-}
-
-const AuthenticatedAdminRouteWithChildren =
-  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
-
 interface AuthenticatedAiSheetsRouteChildren {
   AuthenticatedAiSheetsSheetIdRoute: typeof AuthenticatedAiSheetsSheetIdRoute
 }
@@ -683,11 +672,12 @@ const AuthenticatedAiRouteWithChildren = AuthenticatedAiRoute._addFileChildren(
 )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAiRoute: typeof AuthenticatedAiRouteWithChildren
   AuthenticatedArchiveRoute: typeof AuthenticatedArchiveRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedAdminArchiveRoute: typeof AuthenticatedAdminArchiveRoute
   AuthenticatedLiveSessionIdRoute: typeof AuthenticatedLiveSessionIdRoute
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
   AuthenticatedToolsCalculatorRoute: typeof AuthenticatedToolsCalculatorRoute
@@ -701,11 +691,12 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAiRoute: AuthenticatedAiRouteWithChildren,
   AuthenticatedArchiveRoute: AuthenticatedArchiveRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedAdminArchiveRoute: AuthenticatedAdminArchiveRoute,
   AuthenticatedLiveSessionIdRoute: AuthenticatedLiveSessionIdRoute,
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
   AuthenticatedToolsCalculatorRoute: AuthenticatedToolsCalculatorRoute,
