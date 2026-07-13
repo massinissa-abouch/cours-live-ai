@@ -1,69 +1,49 @@
-## Objectif
+Tu m'as envoyé 5 gros lots de fonctionnalités d'un coup. Techniquement c'est faisable, mais ça représente ~15-20 nouvelles tables, ~30 nouvelles routes, et une dizaine de flux IA. Le livrer en un seul "go" garantit des régressions et un review impossible. Je te propose de découper en 5 livraisons indépendantes, dans l'ordre de valeur produit.
 
-Rendre l'app réellement fonctionnelle (hors paiement Chargily) : la réservation live, l'upload prof, la publication de cours, la lecture des vidéos, la visio Daily.co, les notifications, le tableau de bord et confirmer que le module IA est bien connecté.
+## Ordre de livraison proposé
 
-## Livrables
+**Livraison 1 — Outils élève (Prompt 4)** — base utile immédiatement
+- Chat IA curriculum (déjà en place → j'ajoute sélecteur matière/niveau + prompt aligné BEM/BAC officiel)
+- Calculateur moyenne BEM & BAC (coefficients officiels par filière, 100% front, pas de DB)
+- Compte à rebours examen + checklist chapitres (table `exam_countdowns` existe déjà, à câbler)
+- Banque d'exercices par chapitre (QCM instantané + rédigé corrigé IA) — table `ai_exercises` déjà là
 
-### 1. Réservation live (priorité)
+**Livraison 2 — Archive Bac & BEM + IA (Prompt 1)**
+- Table `exam_archive` (type, année, matière, filière, pdf_url, correction_url)
+- Bucket storage `exam-archive` (public read)
+- Route `/archive` avec filtres année/matière/type
+- Bouton "Aide IA" → ouvre chat contextualisé (matière + année + sujet)
+- Note: je ne peux pas fournir les PDFs officiels moi-même. Il faudra soit que tu les uploades, soit que je crée un back-office admin d'upload + un seed d'exemple. → à confirmer
 
-- Nouvelle page `sessions.book.$teacherId.tsx` : liste les `live_sessions` à venir du prof (créneaux publiés) et permet de réserver en 1 clic. Bouton "Réserver un créneau" sur `/teachers` → route vers cette page (plus d'`alert`).
-- Server function `bookSession` (déjà partielle) élargie : vérifie créneau futur, places restantes (solo=1, group=max 5), empêche double-booking, insère `session_bookings` (status `booked`, mode déduit du type), crée notifications in-app pour élève + prof, renvoie `sessionId` pour redirection.
-- Server fn `cancelBooking` (élève ou prof) qui passe le booking à `cancelled` et notifie.
-- Statuts créneau réels : trigger SQL/fn qui recalcule `live_sessions.status` (`scheduled` → `full` quand plein → `completed` après end time via cron logique côté lecture).
+**Livraison 3 — Croissance (Prompt 5)**
+- Streak quotidien (table + trigger sur activité)
+- Génération image de résultat partageable (canvas côté client → PNG)
+- Parrainage: table `referrals` existe → route `/invite` + déblocage 7j après 3 filleuls inscrits
 
-### 2. Visio Daily.co
+**Livraison 4 — Groupes de révision privés (Prompt 2)**
+- Tables `study_groups`, `group_members` (code invitation unique), `group_messages`, `group_resources`, `group_events`, `group_exam_alerts`
+- Chat temps réel (Realtime), partage ressources (storage bucket privé au groupe), calendrier
+- Annonce contrôle → génération checklist + quiz IA visibles par le groupe
+- Mode Pomodoro synchro avec présence live (Realtime presence)
 
-- Server fn `getOrCreateDailyRoom(sessionId)` : appelée par prof/élève quand session à ≤15 min de scheduled_at. Utilise secret `DAILY_API_KEY` pour créer une room privée (expire à scheduled_at + duration + 30 min), enregistre `daily_room_url` sur la session, renvoie l'URL. Idempotent.
-- Page `_authenticated/live.$sessionId.tsx` : bouton "Rejoindre" actif seulement à partir de T-15min ; embed `<iframe src={daily_room_url}>` une fois cliqué. Quiz temps réel prof→élèves déjà en place — vérifier Realtime OK.
-- Ajouter secret via `add_secret` si `DAILY_API_KEY` n'existe pas encore (le user dit "déjà configurée" — je vérifierai avec `fetch_secrets`).
+**Livraison 5 — Espace communautaire public (Prompt 3)**
+- Tables `community_threads`, `community_posts`, `post_reports`
+- Fils par matière×niveau, tri récents/populaires
+- Rate limiting (max N messages/heure via check côté serverFn)
+- Bouton signalement + queue modération admin
+- Pas de DM: enforced par absence de route DM
 
-### 3. Auth & profils
-
-- `auth.tsx` : après `signUp`, ne pas rediriger si `data.session === null` (email de confirmation en attente) → afficher message "Vérifie ton email".
-- `onboarding.tsx` : distinguer étudiant vs prof (rôle choisi à l'inscription via `?role=teacher`), déclencher création `teacher_profiles` + insertion `user_roles=teacher`, upload réel de la CIN et diplôme dans bucket `teacher-docs` (déjà présent), passer `verification_status='pending'`. Afficher badge statut sur dashboard prof.
-
-### 4. Marketplace cours
-
-- `teacher.courses.new.tsx` : upload réel trailer + N vidéos dans bucket `course-media` (déjà là), insert `courses` (status `published`), insert `course_videos` (position, is_free_preview, video_url).
-- `courses.$courseId.tsx` : bouton "S'inscrire" → server fn `enrollCourse` qui insère `course_enrollments` (payment_id null, auto-validé), incrémente `enrolled_count`. Vidéos non-preview accessibles seulement si enrolled (URL signée via `supabaseAdmin.storage.from('course-media').createSignedUrl` côté server fn `getCourseVideoUrl`).
-
-### 5. Notifications in-app
-
-- Server fns créent des lignes `notifications` (réservation confirmée, session à venir, inscription cours, vérif prof).
-- Cloche dans le header du dashboard listant les non-lues, marquer lu au clic.
-
-### 6. Tableau de bord
-
-- `dashboard.tsx` élève : sections "Cours en cours" (join course_enrollments+courses), "Sessions à venir" (session_bookings status=booked + live_sessions futur), "Sessions passées".
-- `teacher.index.tsx` : sections "Mes cours publiés", "Créneaux publiés" (link vers availability), "Réservations à venir", "Élèves" (distinct student_ids).
-
-### 7. Module IA — vérifier fonctionnel
-
-Le streaming AI chat est déjà branché sur `LOVABLE_API_KEY` avec contexte persistant (`ai_conversations` + `ai_messages`). Rapide sanity check ; corriger si le stream ne s'affiche pas.
-
-## Ce qui est hors scope
-
-- Paiement Chargily (l'inscription/réservation sont auto-validées).
-- Emails transactionnels (on utilise notifications in-app ; email si le domaine est déjà scaffoldé — sinon on note pour plus tard).
-
-## Migration SQL nécessaire
-
-Une seule migration : politiques RLS manquantes sur inserts/reads si besoin, GRANT storage sur buckets teacher-docs / course-media, index `session_bookings(session_id, status)`, éventuel trigger updated_at.
-
-## Ordre d'implémentation
-
-1. Migration + secrets (`DAILY_API_KEY` vérifié).
-2. Réservation bout-en-bout (server fn + page de booking + suppression alert).
-3. Visio Daily (server fn + intégration page live).
-4. Marketplace : publication cours + inscription + lecture vidéo signée.
-5. Auth confirmation email + onboarding prof avec upload.
-6. Notifications + dashboards.
-7. Test rapide IA chat.
+## Ce que je ne fais PAS
+- Aucune modif du système de paiement (Chargily)
+- Je ne fabrique pas de faux contenu Bac/BEM (droits + exactitude)
 
 ## Détails techniques
+- Toutes les tables en RLS scoped `auth.uid()`, GRANT explicites
+- Server functions via `createServerFn` + `requireSupabaseAuth`
+- IA: on garde le routage hybride actuel (gemini-3.5-flash rapide / gpt-5 puissant)
+- Realtime activé uniquement sur `group_messages` et présence Pomodoro
 
-- Utilise `createServerFn` + `requireSupabaseAuth` partout, jamais d'Edge Function.
-- Uploads via `supabase.storage` côté client avec le token utilisateur (buckets privés, policies restreintes).
-- URLs vidéo servies via server fn qui vérifie enrollment puis renvoie une signed URL courte (1h).
-- Daily.co room via `fetch` HTTPS depuis le server fn (pas de SDK Node).
-- Toutes les mutations invalidate les queries clés côté React Query.
+## Ma question
+Je démarre par la **Livraison 1 (Outils élève)** qui donne le plus de valeur immédiate à un élève seul sur l'app ? Ou tu préfères commencer par une autre (ex: Archive, si tu as déjà les PDFs prêts à uploader) ?
+
+Réponds-moi simplement "1", "2", "3", "4" ou "5" (ou "1 puis 2" si tu veux enchaîner), et pour l'Archive, dis-moi si tu fournis les PDFs ou si je monte un back-office d'upload admin.
