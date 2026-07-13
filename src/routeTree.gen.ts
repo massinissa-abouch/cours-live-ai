@@ -25,6 +25,7 @@ import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
+import { Route as AuthenticatedToolsExercisesRouteImport } from './routes/_authenticated/tools.exercises'
 import { Route as AuthenticatedToolsCountdownRouteImport } from './routes/_authenticated/tools.countdown'
 import { Route as AuthenticatedToolsCalculatorRouteImport } from './routes/_authenticated/tools.calculator'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
@@ -118,6 +119,12 @@ const ApiChatConversationIdRoute = ApiChatConversationIdRouteImport.update({
   path: '/api/chat/$conversationId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedToolsExercisesRoute =
+  AuthenticatedToolsExercisesRouteImport.update({
+    id: '/tools/exercises',
+    path: '/tools/exercises',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedToolsCountdownRoute =
   AuthenticatedToolsCountdownRouteImport.update({
     id: '/tools/countdown',
@@ -206,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
+  '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
@@ -234,6 +242,7 @@ export interface FileRoutesByTo {
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
+  '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
@@ -265,6 +274,7 @@ export interface FileRoutesById {
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/_authenticated/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
   '/_authenticated/tools/countdown': typeof AuthenticatedToolsCountdownRoute
+  '/_authenticated/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/teacher/availability'
     | '/tools/calculator'
     | '/tools/countdown'
+    | '/tools/exercises'
     | '/api/chat/$conversationId'
     | '/ai/'
     | '/teacher/'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/teacher/availability'
     | '/tools/calculator'
     | '/tools/countdown'
+    | '/tools/exercises'
     | '/api/chat/$conversationId'
     | '/ai'
     | '/teacher'
@@ -354,6 +366,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/availability'
     | '/_authenticated/tools/calculator'
     | '/_authenticated/tools/countdown'
+    | '/_authenticated/tools/exercises'
     | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
     | '/_authenticated/teacher/'
@@ -492,6 +505,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatConversationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tools/exercises': {
+      id: '/_authenticated/tools/exercises'
+      path: '/tools/exercises'
+      fullPath: '/tools/exercises'
+      preLoaderRoute: typeof AuthenticatedToolsExercisesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tools/countdown': {
       id: '/_authenticated/tools/countdown'
       path: '/tools/countdown'
@@ -621,6 +641,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
   AuthenticatedToolsCalculatorRoute: typeof AuthenticatedToolsCalculatorRoute
   AuthenticatedToolsCountdownRoute: typeof AuthenticatedToolsCountdownRoute
+  AuthenticatedToolsExercisesRoute: typeof AuthenticatedToolsExercisesRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedToolsIndexRoute: typeof AuthenticatedToolsIndexRoute
   AuthenticatedSessionsBookTeacherIdRoute: typeof AuthenticatedSessionsBookTeacherIdRoute
@@ -637,6 +658,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
   AuthenticatedToolsCalculatorRoute: AuthenticatedToolsCalculatorRoute,
   AuthenticatedToolsCountdownRoute: AuthenticatedToolsCountdownRoute,
+  AuthenticatedToolsExercisesRoute: AuthenticatedToolsExercisesRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
   AuthenticatedToolsIndexRoute: AuthenticatedToolsIndexRoute,
   AuthenticatedSessionsBookTeacherIdRoute:
