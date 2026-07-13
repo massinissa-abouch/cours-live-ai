@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authenticated/tools.index'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenticated/groups.index'
+import { Route as AuthenticatedCommunityIndexRouteImport } from './routes/_authenticated/community.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
 import { Route as AuthenticatedToolsExercisesRouteImport } from './routes/_authenticated/tools.exercises'
@@ -128,6 +129,12 @@ const AuthenticatedGroupsIndexRoute =
   AuthenticatedGroupsIndexRouteImport.update({
     id: '/groups/',
     path: '/groups/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCommunityIndexRoute =
+  AuthenticatedCommunityIndexRouteImport.update({
+    id: '/community/',
+    path: '/community/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAiIndexRoute = AuthenticatedAiIndexRouteImport.update({
@@ -253,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
+  '/community/': typeof AuthenticatedCommunityIndexRoute
   '/groups/': typeof AuthenticatedGroupsIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/tools/': typeof AuthenticatedToolsIndexRoute
@@ -287,6 +295,7 @@ export interface FileRoutesByTo {
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
+  '/community': typeof AuthenticatedCommunityIndexRoute
   '/groups': typeof AuthenticatedGroupsIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/tools': typeof AuthenticatedToolsIndexRoute
@@ -324,6 +333,7 @@ export interface FileRoutesById {
   '/_authenticated/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
+  '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
   '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/tools/exercises'
     | '/api/chat/$conversationId'
     | '/ai/'
+    | '/community/'
     | '/groups/'
     | '/teacher/'
     | '/tools/'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/tools/exercises'
     | '/api/chat/$conversationId'
     | '/ai'
+    | '/community'
     | '/groups'
     | '/teacher'
     | '/tools'
@@ -431,6 +443,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tools/exercises'
     | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
+    | '/_authenticated/community/'
     | '/_authenticated/groups/'
     | '/_authenticated/teacher/'
     | '/_authenticated/tools/'
@@ -573,6 +586,13 @@ declare module '@tanstack/react-router' {
       path: '/groups'
       fullPath: '/groups/'
       preLoaderRoute: typeof AuthenticatedGroupsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/community/': {
+      id: '/_authenticated/community/'
+      path: '/community'
+      fullPath: '/community/'
+      preLoaderRoute: typeof AuthenticatedCommunityIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ai/': {
@@ -744,6 +764,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedToolsCalculatorRoute: typeof AuthenticatedToolsCalculatorRoute
   AuthenticatedToolsCountdownRoute: typeof AuthenticatedToolsCountdownRoute
   AuthenticatedToolsExercisesRoute: typeof AuthenticatedToolsExercisesRoute
+  AuthenticatedCommunityIndexRoute: typeof AuthenticatedCommunityIndexRoute
   AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedToolsIndexRoute: typeof AuthenticatedToolsIndexRoute
@@ -766,6 +787,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedToolsCalculatorRoute: AuthenticatedToolsCalculatorRoute,
   AuthenticatedToolsCountdownRoute: AuthenticatedToolsCountdownRoute,
   AuthenticatedToolsExercisesRoute: AuthenticatedToolsExercisesRoute,
+  AuthenticatedCommunityIndexRoute: AuthenticatedCommunityIndexRoute,
   AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
   AuthenticatedToolsIndexRoute: AuthenticatedToolsIndexRoute,
