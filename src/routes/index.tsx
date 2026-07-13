@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GraduationCap, Video, Sparkles, ShieldCheck, Clock, Users } from "lucide-react";
+import { GraduationCap, Video, Sparkles, ShieldCheck, Clock, Users, MessagesSquare, Archive, Wrench, UsersRound } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -11,6 +11,7 @@ function Landing() {
       <SiteHeader />
       <Hero />
       <Pillars />
+      <MoreFeatures />
       <HowItWorks />
       <Trust />
       <Footer />
