@@ -33,6 +33,7 @@ import { Route as AuthenticatedToolsCountdownRouteImport } from './routes/_authe
 import { Route as AuthenticatedToolsCalculatorRouteImport } from './routes/_authenticated/tools.calculator'
 import { Route as AuthenticatedTeacherAvailabilityRouteImport } from './routes/_authenticated/teacher.availability'
 import { Route as AuthenticatedLiveSessionIdRouteImport } from './routes/_authenticated/live.$sessionId'
+import { Route as AuthenticatedGroupsGroupIdRouteImport } from './routes/_authenticated/groups.$groupId'
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
 import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin_.archive'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
@@ -169,6 +170,12 @@ const AuthenticatedLiveSessionIdRoute =
     path: '/live/$sessionId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedGroupsGroupIdRoute =
+  AuthenticatedGroupsGroupIdRouteImport.update({
+    id: '/groups/$groupId',
+    path: '/groups/$groupId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAiSheetsRoute = AuthenticatedAiSheetsRouteImport.update({
   id: '/sheets',
   path: '/sheets',
@@ -238,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
   '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
@@ -271,6 +279,7 @@ export interface FileRoutesByTo {
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
   '/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
@@ -307,6 +316,7 @@ export interface FileRoutesById {
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/_authenticated/admin_/archive': typeof AuthenticatedAdminArchiveRoute
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
+  '/_authenticated/groups/$groupId': typeof AuthenticatedGroupsGroupIdRoute
   '/_authenticated/live/$sessionId': typeof AuthenticatedLiveSessionIdRoute
   '/_authenticated/teacher/availability': typeof AuthenticatedTeacherAvailabilityRoute
   '/_authenticated/tools/calculator': typeof AuthenticatedToolsCalculatorRoute
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | '/sessions/$sessionId'
     | '/admin/archive'
     | '/ai/sheets'
+    | '/groups/$groupId'
     | '/live/$sessionId'
     | '/teacher/availability'
     | '/tools/calculator'
@@ -376,6 +387,7 @@ export interface FileRouteTypes {
     | '/sessions/$sessionId'
     | '/admin/archive'
     | '/ai/sheets'
+    | '/groups/$groupId'
     | '/live/$sessionId'
     | '/teacher/availability'
     | '/tools/calculator'
@@ -411,6 +423,7 @@ export interface FileRouteTypes {
     | '/sessions/$sessionId'
     | '/_authenticated/admin_/archive'
     | '/_authenticated/ai/sheets'
+    | '/_authenticated/groups/$groupId'
     | '/_authenticated/live/$sessionId'
     | '/_authenticated/teacher/availability'
     | '/_authenticated/tools/calculator'
@@ -611,6 +624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLiveSessionIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/groups/$groupId': {
+      id: '/_authenticated/groups/$groupId'
+      path: '/groups/$groupId'
+      fullPath: '/groups/$groupId'
+      preLoaderRoute: typeof AuthenticatedGroupsGroupIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ai/sheets': {
       id: '/_authenticated/ai/sheets'
       path: '/sheets'
@@ -718,6 +738,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedAdminArchiveRoute: typeof AuthenticatedAdminArchiveRoute
+  AuthenticatedGroupsGroupIdRoute: typeof AuthenticatedGroupsGroupIdRoute
   AuthenticatedLiveSessionIdRoute: typeof AuthenticatedLiveSessionIdRoute
   AuthenticatedTeacherAvailabilityRoute: typeof AuthenticatedTeacherAvailabilityRoute
   AuthenticatedToolsCalculatorRoute: typeof AuthenticatedToolsCalculatorRoute
@@ -739,6 +760,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInviteRoute: AuthenticatedInviteRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedAdminArchiveRoute: AuthenticatedAdminArchiveRoute,
+  AuthenticatedGroupsGroupIdRoute: AuthenticatedGroupsGroupIdRoute,
   AuthenticatedLiveSessionIdRoute: AuthenticatedLiveSessionIdRoute,
   AuthenticatedTeacherAvailabilityRoute: AuthenticatedTeacherAvailabilityRoute,
   AuthenticatedToolsCalculatorRoute: AuthenticatedToolsCalculatorRoute,
