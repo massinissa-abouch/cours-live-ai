@@ -60,6 +60,10 @@ function ArchivePage() {
 
   async function openPdf(path: string) {
     try {
+      if (/^https?:\/\//i.test(path)) {
+        window.open(path, "_blank", "noopener,noreferrer");
+        return;
+      }
       const { signedUrl } = await sign({ data: { path } });
       window.open(signedUrl, "_blank", "noopener,noreferrer");
     } catch (e) {
