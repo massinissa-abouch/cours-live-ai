@@ -993,6 +993,98 @@ export type Database = {
         }
         Relationships: []
       }
+      memo_progress: {
+        Row: {
+          attempts: number
+          block_index: number
+          created_at: string
+          id: string
+          mastered_at: string | null
+          next_review_at: string | null
+          quiz_score: number | null
+          sheet_id: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          block_index: number
+          created_at?: string
+          id?: string
+          mastered_at?: string | null
+          next_review_at?: string | null
+          quiz_score?: number | null
+          sheet_id: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          block_index?: number
+          created_at?: string
+          id?: string
+          mastered_at?: string | null
+          next_review_at?: string | null
+          quiz_score?: number | null
+          sheet_id?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memo_progress_sheet_id_fkey"
+            columns: ["sheet_id"]
+            isOneToOne: false
+            referencedRelation: "memo_sheets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memo_sheets: {
+        Row: {
+          blocks: Json
+          chapter: string | null
+          created_at: string
+          formats: Json
+          id: string
+          level: string | null
+          source_kind: string
+          source_text: string | null
+          student_id: string
+          subject: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          blocks?: Json
+          chapter?: string | null
+          created_at?: string
+          formats?: Json
+          id?: string
+          level?: string | null
+          source_kind?: string
+          source_text?: string | null
+          student_id: string
+          subject?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          blocks?: Json
+          chapter?: string | null
+          created_at?: string
+          formats?: Json
+          id?: string
+          level?: string | null
+          source_kind?: string
+          source_text?: string | null
+          student_id?: string
+          subject?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null

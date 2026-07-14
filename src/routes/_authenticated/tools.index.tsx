@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Calculator, Timer, BookOpenCheck, ArrowLeft, ListChecks } from "lucide-react";
+import { Calculator, Timer, BookOpenCheck, ArrowLeft, ListChecks, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tools/")({
   component: ToolsHub,
@@ -13,6 +13,12 @@ function ToolsHub() {
       title: "Cahier de textes intelligent",
       desc: "Photographie l'exercice — l'IA planifie et t'envoie des rappels avant l'échéance.",
     },
+      {
+        to: "/tools/memo" as const,
+        icon: Sparkles,
+        title: "Mémo Express",
+        desc: "Transforme un long cours en fiches courtes, mnémos et quiz flash. Idéal pour l'histoire-géo.",
+      },
     {
       to: "/tools/calculator" as const,
       icon: Calculator,
