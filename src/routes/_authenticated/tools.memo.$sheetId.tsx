@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Brain, CheckCircle2, ChevronLeft, ChevronRight, 
 import { toast } from "sonner";
 import { getMemoSheet, simplifyBlock, markBlockProgress } from "@/lib/memo.functions";
 
-export const Route = createFileRoute("/_authenticated/tools/memo/")({
+export const Route = createFileRoute("/_authenticated/tools/memo/$sheetId")({
   component: MemoSheetPage,
   pendingComponent: () => (
     <div className="flex min-h-screen items-center justify-center bg-background">

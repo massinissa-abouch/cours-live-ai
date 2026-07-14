@@ -42,13 +42,13 @@ import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin_.moderation'
 import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin_.archive'
 import { Route as ApiPublicHooksTaskRemindersRouteImport } from './routes/api/public/hooks/task-reminders'
+import { Route as AuthenticatedToolsMemoSheetIdRouteImport } from './routes/_authenticated/tools.memo.$sheetId'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
 import { Route as AuthenticatedSessionsBookTeacherIdRouteImport } from './routes/_authenticated/sessions.book.$teacherId'
 import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_authenticated/ai.sheets.$sheetId'
 import { Route as AuthenticatedAiExamNewRouteImport } from './routes/_authenticated/ai.exam.new'
 import { Route as AuthenticatedAiExamExamIdRouteImport } from './routes/_authenticated/ai.exam.$examId'
 import { Route as AuthenticatedAiCConversationIdRouteImport } from './routes/_authenticated/ai.c.$conversationId'
-import { Route as AuthenticatedToolsMemoRouteImport } from './routes/_authenticated/tools.memo.'
 import { Route as AuthenticatedTeacherCoursesCourseIdChaptersRouteImport } from './routes/_authenticated/teacher.courses.$courseId.chapters'
 
 const TeachersRoute = TeachersRouteImport.update({
@@ -229,6 +229,12 @@ const ApiPublicHooksTaskRemindersRoute =
     path: '/api/public/hooks/task-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedToolsMemoSheetIdRoute =
+  AuthenticatedToolsMemoSheetIdRouteImport.update({
+    id: '/$sheetId',
+    path: '/$sheetId',
+    getParentRoute: () => AuthenticatedToolsMemoRoute,
+  } as any)
 const AuthenticatedTeacherCoursesNewRoute =
   AuthenticatedTeacherCoursesNewRouteImport.update({
     id: '/teacher/courses/new',
@@ -264,11 +270,6 @@ const AuthenticatedAiCConversationIdRoute =
     path: '/c/$conversationId',
     getParentRoute: () => AuthenticatedAiRoute,
   } as any)
-const AuthenticatedToolsMemoRoute = AuthenticatedToolsMemoRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedToolsMemoRoute,
-} as any)
 const AuthenticatedTeacherCoursesCourseIdChaptersRoute =
   AuthenticatedTeacherCoursesCourseIdChaptersRouteImport.update({
     id: '/teacher/courses/$courseId/chapters',
@@ -308,13 +309,13 @@ export interface FileRoutesByFullPath {
   '/groups/': typeof AuthenticatedGroupsIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/tools/': typeof AuthenticatedToolsIndexRoute
-  '/tools/memo/': typeof AuthenticatedToolsMemoRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
@@ -342,19 +343,20 @@ export interface FileRoutesByTo {
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
+  '/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
   '/groups': typeof AuthenticatedGroupsIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/tools': typeof AuthenticatedToolsIndexRoute
-  '/tools/memo': typeof AuthenticatedToolsMemoRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
@@ -392,13 +394,13 @@ export interface FileRoutesById {
   '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
-  '/_authenticated/tools/memo/': typeof AuthenticatedToolsMemoRoute
   '/_authenticated/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/_authenticated/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/_authenticated/ai/exam/new': typeof AuthenticatedAiExamNewRoute
   '/_authenticated/ai/sheets/$sheetId': typeof AuthenticatedAiSheetsSheetIdRoute
   '/_authenticated/sessions/book/$teacherId': typeof AuthenticatedSessionsBookTeacherIdRoute
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
+  '/_authenticated/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/_authenticated/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
@@ -436,13 +438,13 @@ export interface FileRouteTypes {
     | '/groups/'
     | '/teacher/'
     | '/tools/'
-    | '/tools/memo/'
     | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
     | '/ai/sheets/$sheetId'
     | '/sessions/book/$teacherId'
     | '/teacher/courses/new'
+    | '/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
     | '/teacher/courses/$courseId/chapters'
   fileRoutesByTo: FileRoutesByTo
@@ -470,19 +472,20 @@ export interface FileRouteTypes {
     | '/tools/countdown'
     | '/tools/exercises'
     | '/tools/homework'
+    | '/tools/memo'
     | '/api/chat/$conversationId'
     | '/ai'
     | '/community'
     | '/groups'
     | '/teacher'
     | '/tools'
-    | '/tools/memo'
     | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
     | '/ai/sheets/$sheetId'
     | '/sessions/book/$teacherId'
     | '/teacher/courses/new'
+    | '/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
     | '/teacher/courses/$courseId/chapters'
   id:
@@ -519,13 +522,13 @@ export interface FileRouteTypes {
     | '/_authenticated/groups/'
     | '/_authenticated/teacher/'
     | '/_authenticated/tools/'
-    | '/_authenticated/tools/memo/'
     | '/_authenticated/ai/c/$conversationId'
     | '/_authenticated/ai/exam/$examId'
     | '/_authenticated/ai/exam/new'
     | '/_authenticated/ai/sheets/$sheetId'
     | '/_authenticated/sessions/book/$teacherId'
     | '/_authenticated/teacher/courses/new'
+    | '/_authenticated/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
     | '/_authenticated/teacher/courses/$courseId/chapters'
   fileRoutesById: FileRoutesById
@@ -775,6 +778,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTaskRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tools/memo/$sheetId': {
+      id: '/_authenticated/tools/memo/$sheetId'
+      path: '/$sheetId'
+      fullPath: '/tools/memo/$sheetId'
+      preLoaderRoute: typeof AuthenticatedToolsMemoSheetIdRouteImport
+      parentRoute: typeof AuthenticatedToolsMemoRoute
+    }
     '/_authenticated/teacher/courses/new': {
       id: '/_authenticated/teacher/courses/new'
       path: '/teacher/courses/new'
@@ -816,13 +826,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/ai/c/$conversationId'
       preLoaderRoute: typeof AuthenticatedAiCConversationIdRouteImport
       parentRoute: typeof AuthenticatedAiRoute
-    }
-    '/_authenticated/tools/memo/': {
-      id: '/_authenticated/tools/memo/'
-      path: '/'
-      fullPath: '/tools/memo/'
-      preLoaderRoute: typeof AuthenticatedToolsMemoRouteImport
-      parentRoute: typeof AuthenticatedToolsMemoRoute
     }
     '/_authenticated/teacher/courses/$courseId/chapters': {
       id: '/_authenticated/teacher/courses/$courseId/chapters'
@@ -868,12 +871,12 @@ const AuthenticatedAiRouteWithChildren = AuthenticatedAiRoute._addFileChildren(
 )
 
 interface AuthenticatedToolsMemoRouteChildren {
-  AuthenticatedToolsMemoRoute: typeof AuthenticatedToolsMemoRoute
+  AuthenticatedToolsMemoSheetIdRoute: typeof AuthenticatedToolsMemoSheetIdRoute
 }
 
 const AuthenticatedToolsMemoRouteChildren: AuthenticatedToolsMemoRouteChildren =
   {
-    AuthenticatedToolsMemoRoute: AuthenticatedToolsMemoRoute,
+    AuthenticatedToolsMemoSheetIdRoute: AuthenticatedToolsMemoSheetIdRoute,
   }
 
 const AuthenticatedToolsMemoRouteWithChildren =
