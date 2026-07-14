@@ -48,6 +48,7 @@ import { Route as AuthenticatedAiSheetsSheetIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedAiExamNewRouteImport } from './routes/_authenticated/ai.exam.new'
 import { Route as AuthenticatedAiExamExamIdRouteImport } from './routes/_authenticated/ai.exam.$examId'
 import { Route as AuthenticatedAiCConversationIdRouteImport } from './routes/_authenticated/ai.c.$conversationId'
+import { Route as AuthenticatedToolsMemoRouteImport } from './routes/_authenticated/tools.memo.'
 import { Route as AuthenticatedTeacherCoursesCourseIdChaptersRouteImport } from './routes/_authenticated/teacher.courses.$courseId.chapters'
 
 const TeachersRoute = TeachersRouteImport.update({
@@ -263,6 +264,11 @@ const AuthenticatedAiCConversationIdRoute =
     path: '/c/$conversationId',
     getParentRoute: () => AuthenticatedAiRoute,
   } as any)
+const AuthenticatedToolsMemoRoute = AuthenticatedToolsMemoRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedToolsMemoRoute,
+} as any)
 const AuthenticatedTeacherCoursesCourseIdChaptersRoute =
   AuthenticatedTeacherCoursesCourseIdChaptersRouteImport.update({
     id: '/teacher/courses/$courseId/chapters',
@@ -295,13 +301,14 @@ export interface FileRoutesByFullPath {
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
-  '/tools/memo': typeof AuthenticatedToolsMemoRoute
+  '/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/community/': typeof AuthenticatedCommunityIndexRoute
   '/groups/': typeof AuthenticatedGroupsIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/tools/': typeof AuthenticatedToolsIndexRoute
+  '/tools/memo/': typeof AuthenticatedToolsMemoRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -335,13 +342,13 @@ export interface FileRoutesByTo {
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
-  '/tools/memo': typeof AuthenticatedToolsMemoRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
   '/groups': typeof AuthenticatedGroupsIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/tools': typeof AuthenticatedToolsIndexRoute
+  '/tools/memo': typeof AuthenticatedToolsMemoRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -378,13 +385,14 @@ export interface FileRoutesById {
   '/_authenticated/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/_authenticated/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/_authenticated/tools/homework': typeof AuthenticatedToolsHomeworkRoute
-  '/_authenticated/tools/memo': typeof AuthenticatedToolsMemoRoute
+  '/_authenticated/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
   '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
+  '/_authenticated/tools/memo/': typeof AuthenticatedToolsMemoRoute
   '/_authenticated/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/_authenticated/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/_authenticated/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -428,6 +436,7 @@ export interface FileRouteTypes {
     | '/groups/'
     | '/teacher/'
     | '/tools/'
+    | '/tools/memo/'
     | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
@@ -461,13 +470,13 @@ export interface FileRouteTypes {
     | '/tools/countdown'
     | '/tools/exercises'
     | '/tools/homework'
-    | '/tools/memo'
     | '/api/chat/$conversationId'
     | '/ai'
     | '/community'
     | '/groups'
     | '/teacher'
     | '/tools'
+    | '/tools/memo'
     | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
@@ -510,6 +519,7 @@ export interface FileRouteTypes {
     | '/_authenticated/groups/'
     | '/_authenticated/teacher/'
     | '/_authenticated/tools/'
+    | '/_authenticated/tools/memo/'
     | '/_authenticated/ai/c/$conversationId'
     | '/_authenticated/ai/exam/$examId'
     | '/_authenticated/ai/exam/new'
@@ -807,6 +817,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiCConversationIdRouteImport
       parentRoute: typeof AuthenticatedAiRoute
     }
+    '/_authenticated/tools/memo/': {
+      id: '/_authenticated/tools/memo/'
+      path: '/'
+      fullPath: '/tools/memo/'
+      preLoaderRoute: typeof AuthenticatedToolsMemoRouteImport
+      parentRoute: typeof AuthenticatedToolsMemoRoute
+    }
     '/_authenticated/teacher/courses/$courseId/chapters': {
       id: '/_authenticated/teacher/courses/$courseId/chapters'
       path: '/teacher/courses/$courseId/chapters'
@@ -850,6 +867,20 @@ const AuthenticatedAiRouteWithChildren = AuthenticatedAiRoute._addFileChildren(
   AuthenticatedAiRouteChildren,
 )
 
+interface AuthenticatedToolsMemoRouteChildren {
+  AuthenticatedToolsMemoRoute: typeof AuthenticatedToolsMemoRoute
+}
+
+const AuthenticatedToolsMemoRouteChildren: AuthenticatedToolsMemoRouteChildren =
+  {
+    AuthenticatedToolsMemoRoute: AuthenticatedToolsMemoRoute,
+  }
+
+const AuthenticatedToolsMemoRouteWithChildren =
+  AuthenticatedToolsMemoRoute._addFileChildren(
+    AuthenticatedToolsMemoRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAiRoute: typeof AuthenticatedAiRouteWithChildren
@@ -867,7 +898,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedToolsCountdownRoute: typeof AuthenticatedToolsCountdownRoute
   AuthenticatedToolsExercisesRoute: typeof AuthenticatedToolsExercisesRoute
   AuthenticatedToolsHomeworkRoute: typeof AuthenticatedToolsHomeworkRoute
-  AuthenticatedToolsMemoRoute: typeof AuthenticatedToolsMemoRoute
+  AuthenticatedToolsMemoRoute: typeof AuthenticatedToolsMemoRouteWithChildren
   AuthenticatedCommunityIndexRoute: typeof AuthenticatedCommunityIndexRoute
   AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
@@ -894,7 +925,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedToolsCountdownRoute: AuthenticatedToolsCountdownRoute,
   AuthenticatedToolsExercisesRoute: AuthenticatedToolsExercisesRoute,
   AuthenticatedToolsHomeworkRoute: AuthenticatedToolsHomeworkRoute,
-  AuthenticatedToolsMemoRoute: AuthenticatedToolsMemoRoute,
+  AuthenticatedToolsMemoRoute: AuthenticatedToolsMemoRouteWithChildren,
   AuthenticatedCommunityIndexRoute: AuthenticatedCommunityIndexRoute,
   AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
