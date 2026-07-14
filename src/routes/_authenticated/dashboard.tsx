@@ -8,6 +8,8 @@ import { listMyBookings } from "@/lib/live-session.functions";
 import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
 import { getAiCostSummary } from "@/lib/ai-cost.functions";
 import { pingStreak, getGrowthStatus } from "@/lib/growth.functions";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useT } from "@/lib/i18n/provider";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -20,6 +22,7 @@ type Notif = Awaited<ReturnType<typeof listMyNotifications>>[number];
 function Dashboard() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
+  const t = useT();
   const [isTeacher, setIsTeacher] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [aiCost, setAiCost] = useState<Awaited<ReturnType<typeof getAiCostSummary>> | null>(null);
@@ -115,8 +118,9 @@ function Dashboard() {
               )}
             </div>
             <button onClick={signOut} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-secondary">
-              <LogOut className="h-4 w-4" /> Déconnexion
+              <LogOut className="h-4 w-4" /> {t("nav.logout")}
             </button>
+            <LanguageSwitcher compact />
           </div>
         </div>
       </header>
