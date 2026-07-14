@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 type Search = { mode?: "signin" | "signup"; role?: "student" | "teacher" | "parent"; ref?: string };
 
@@ -75,6 +76,9 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="mx-auto flex max-w-md justify-end px-4 pt-4">
+        <LanguageSwitcher />
+      </div>
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10">
         <Link to="/" className="mb-8 flex items-center gap-2">
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground font-bold">أ</div>
