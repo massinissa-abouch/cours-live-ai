@@ -29,6 +29,7 @@ import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCommunityIndexRouteImport } from './routes/_authenticated/community.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
 import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
+import { Route as AuthenticatedToolsMemoRouteImport } from './routes/_authenticated/tools.memo'
 import { Route as AuthenticatedToolsHomeworkRouteImport } from './routes/_authenticated/tools.homework'
 import { Route as AuthenticatedToolsExercisesRouteImport } from './routes/_authenticated/tools.exercises'
 import { Route as AuthenticatedToolsCountdownRouteImport } from './routes/_authenticated/tools.countdown'
@@ -150,6 +151,11 @@ const ApiChatConversationIdRoute = ApiChatConversationIdRouteImport.update({
   id: '/api/chat/$conversationId',
   path: '/api/chat/$conversationId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedToolsMemoRoute = AuthenticatedToolsMemoRouteImport.update({
+  id: '/tools/memo',
+  path: '/tools/memo',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedToolsHomeworkRoute =
   AuthenticatedToolsHomeworkRouteImport.update({
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
+  '/tools/memo': typeof AuthenticatedToolsMemoRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/community/': typeof AuthenticatedCommunityIndexRoute
@@ -328,6 +335,7 @@ export interface FileRoutesByTo {
   '/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
+  '/tools/memo': typeof AuthenticatedToolsMemoRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/ai': typeof AuthenticatedAiIndexRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/_authenticated/tools/countdown': typeof AuthenticatedToolsCountdownRoute
   '/_authenticated/tools/exercises': typeof AuthenticatedToolsExercisesRoute
   '/_authenticated/tools/homework': typeof AuthenticatedToolsHomeworkRoute
+  '/_authenticated/tools/memo': typeof AuthenticatedToolsMemoRoute
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
@@ -412,6 +421,7 @@ export interface FileRouteTypes {
     | '/tools/countdown'
     | '/tools/exercises'
     | '/tools/homework'
+    | '/tools/memo'
     | '/api/chat/$conversationId'
     | '/ai/'
     | '/community/'
@@ -451,6 +461,7 @@ export interface FileRouteTypes {
     | '/tools/countdown'
     | '/tools/exercises'
     | '/tools/homework'
+    | '/tools/memo'
     | '/api/chat/$conversationId'
     | '/ai'
     | '/community'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tools/countdown'
     | '/_authenticated/tools/exercises'
     | '/_authenticated/tools/homework'
+    | '/_authenticated/tools/memo'
     | '/api/chat/$conversationId'
     | '/_authenticated/ai/'
     | '/_authenticated/community/'
@@ -661,6 +673,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat/$conversationId'
       preLoaderRoute: typeof ApiChatConversationIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tools/memo': {
+      id: '/_authenticated/tools/memo'
+      path: '/tools/memo'
+      fullPath: '/tools/memo'
+      preLoaderRoute: typeof AuthenticatedToolsMemoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tools/homework': {
       id: '/_authenticated/tools/homework'
@@ -848,6 +867,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedToolsCountdownRoute: typeof AuthenticatedToolsCountdownRoute
   AuthenticatedToolsExercisesRoute: typeof AuthenticatedToolsExercisesRoute
   AuthenticatedToolsHomeworkRoute: typeof AuthenticatedToolsHomeworkRoute
+  AuthenticatedToolsMemoRoute: typeof AuthenticatedToolsMemoRoute
   AuthenticatedCommunityIndexRoute: typeof AuthenticatedCommunityIndexRoute
   AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
@@ -874,6 +894,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedToolsCountdownRoute: AuthenticatedToolsCountdownRoute,
   AuthenticatedToolsExercisesRoute: AuthenticatedToolsExercisesRoute,
   AuthenticatedToolsHomeworkRoute: AuthenticatedToolsHomeworkRoute,
+  AuthenticatedToolsMemoRoute: AuthenticatedToolsMemoRoute,
   AuthenticatedCommunityIndexRoute: AuthenticatedCommunityIndexRoute,
   AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
