@@ -21,7 +21,16 @@ function labelFor(tier: Tier): { emoji: string; head: string } {
 export const Route = createFileRoute("/api/public/hooks/task-reminders")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const expected = process.env.TASK_REMINDERS_SECRET;
+        const authHeader = request.headers.get("authorization") ?? "";
+        const provided = authHeader.startsWith("Bearer ")
+          ? authHeader.slice(7).trim()
+          : "";
+        if (!expected || !provided || provided !== expected) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         // Fenêtre : tâches ouvertes avec échéance dans les 4 jours ou déjà en retard (72h de rattrapage)
