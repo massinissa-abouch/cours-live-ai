@@ -4,6 +4,8 @@ import { streamText, type ModelMessage } from "ai";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { fetchChapters, curriculumPromptBlock, languageDirective } from "@/lib/curriculum.server";
+import type { Lang } from "@/lib/i18n/translations";
 
 const BodySchema = z.object({
   content: z.string().min(1).max(8000),
@@ -17,25 +19,30 @@ function systemPrompt(
   level: string | null,
   chapter: string | null,
   mode: "chat" | "hint" | "harder",
-  hintLevel?: number,
+  hintLevel: number | undefined,
+  lang: Lang,
+  curriculumBlock: string,
 ) {
-  const base = `Tu es Ostadi, tuteur IA bienveillant, patient et rigoureux pour les élèves algériens (BEM, BAC, université).
+  const base = `Tu es Ostadi, tuteur IA bienveillant, patient et rigoureux pour les élèves algériens (programme officiel BEM, BAC, université).
 
 Style de conversation :
-- Parle en français clair, chaleureux, comme un grand frère qui explique.
+- Ton chaleureux, comme un grand frère qui explique.
 - Réponds de manière NATURELLE et conversationnelle, pas comme un manuel.
 - Pose des questions de retour quand c'est utile pour vérifier la compréhension.
 - Utilise Markdown : ### titres, listes, **gras**, > citations.
-- Pour maths/physique/chimie : formules LaTeX en \\( ... \\) inline ou $$ ... $$ en bloc.
 - Étape par étape, une idée à la fois. Encourage.
+
+${languageDirective(lang)}
+
+${curriculumBlock}
 
 ${subject ? `Matière : **${subject}**.` : ""}
 ${level ? `Niveau : **${level}**.` : ""}
 ${chapter ? `Chapitre : **${chapter}**.` : ""}
 
-Contexte : programme scolaire algérien officiel (BEM, BAC scientifique/lettres/tech-math, licence).
 Corrige avec bienveillance : explique OÙ et POURQUOI c'est faux, pas juste "faux".
-Si l'élève envoie une photo d'exercice, lis attentivement l'énoncé et adapte tes explications.`;
+Si l'élève envoie une photo d'un sujet BEM ou BAC, reconnais le format et adapte le niveau d'explication en conséquence.
+Applique la méthode de résolution attendue à l'examen algérien, pas une méthode alternative.`;
 
   if (mode === "hint") {
     const t = hintLevel === 1
@@ -91,6 +98,24 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
           .eq("student_id", userId)
           .maybeSingle();
         if (!conv) return new Response("Not found", { status: 404 });
+
+        // Language preference from student profile (fr default)
+        const { data: prof } = await supabase
+          .from("student_profiles")
+          .select("preferred_language")
+          .eq("user_id", userId)
+          .maybeSingle();
+        const lang: Lang = prof?.preferred_language === "ar" ? "ar" : "fr";
+
+        // Fetch Algerian curriculum chapters for this conversation context.
+        const chapters = await fetchChapters(supabase, {
+          level: conv.level,
+          subject: conv.subject,
+        });
+        const curriculumBlock = curriculumPromptBlock(chapters, lang, {
+          level: conv.level,
+          subject: conv.subject,
+        });
 
         const { data: history } = await supabase
           .from("ai_messages")
@@ -163,7 +188,7 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 
         const result = streamText({
           model,
-          system: systemPrompt(conv.subject, conv.level, conv.chapter, body.mode, body.hintLevel),
+          system: systemPrompt(conv.subject, conv.level, conv.chapter, body.mode, body.hintLevel, lang, curriculumBlock),
           messages,
           onFinish: async ({ text, usage }) => {
             await supabase.from("ai_messages").insert({

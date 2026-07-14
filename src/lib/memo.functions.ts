@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { fetchChapters, curriculumPromptBlock, languageDirective } from "./curriculum.server";
 
 // ---------- Types ----------
 export type MemoBlock = { title: string; key_points: string[] };
@@ -30,6 +31,8 @@ const GenerateInput = z.object({
   imageDataUrl: z.string().max(6_000_000).optional(),
   level: z.string().max(40).optional(),
   hintSubject: z.string().max(60).optional(),
+  filiere: z.string().max(60).optional(),
+  language: z.enum(["fr", "ar"]).optional(),
 });
 
 export const generateMemoSheet = createServerFn({ method: "POST" })
@@ -40,11 +43,37 @@ export const generateMemoSheet = createServerFn({ method: "POST" })
     if (!key) throw new Error("LOVABLE_API_KEY manquant");
     if (!data.sourceText && !data.imageDataUrl) throw new Error("Fournis du texte ou une photo");
 
+    // Resolve language: input > profile > fr
+    let lang: "fr" | "ar" = data.language ?? "fr";
+    if (!data.language) {
+      const { data: prof } = await context.supabase
+        .from("student_profiles")
+        .select("preferred_language")
+        .eq("user_id", context.userId)
+        .maybeSingle();
+      if (prof?.preferred_language === "ar") lang = "ar";
+    }
+
+    const chapters = await fetchChapters(context.supabase, {
+      level: data.level,
+      subject: data.hintSubject,
+      filiere: data.filiere,
+    });
+    const curriculumBlock = curriculumPromptBlock(chapters, lang, {
+      level: data.level,
+      subject: data.hintSubject,
+      filiere: data.filiere,
+    });
+
     const gateway = createLovableAiGatewayProvider(key);
     const model = gateway("google/gemini-3-flash-preview");
 
-    const system = `Tu es un pédagogue expert du programme scolaire algérien (histoire, géographie, sciences, langues).
+    const system = `Tu es un pédagogue expert du programme scolaire officiel algérien (histoire, géographie, sciences, langues).
 On te donne un cours LONG et dense. Ta mission : le transformer en une fiche mémo courte, ultra facile à retenir pour un élève.
+
+${languageDirective(lang)}
+
+${curriculumBlock}
 
 Réponds STRICTEMENT en JSON valide (pas de texte autour, pas de markdown) avec CE schéma exact :
 {
@@ -71,8 +100,9 @@ Réponds STRICTEMENT en JSON valide (pas de texte autour, pas de markdown) avec 
 }
 
 Règles :
-- Écris tout en FRANÇAIS clair et simple.
+- Rédige tout le contenu (titres, points, mnémoniques, questions) dans la LANGUE indiquée ci-dessus (fr ou ar).
 - Phrases COURTES, pas de blabla. Priorité aux dates, noms, chiffres, lieux clés.
+- Utilise la terminologie officielle des manuels scolaires algériens (BEM/BAC).
 - Découpe les blocs pour révision espacée (le bloc 1 = les bases, dernier bloc = détails avancés).
 - N'invente pas de faits qui ne sont pas dans le cours fourni.`;
 

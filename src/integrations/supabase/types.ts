@@ -624,6 +624,45 @@ export type Database = {
         }
         Relationships: []
       }
+      curriculum: {
+        Row: {
+          chapter_order: number
+          chapter_title_ar: string | null
+          chapter_title_fr: string
+          created_at: string
+          filiere: string | null
+          id: string
+          keywords: string[]
+          level: string
+          notes: string | null
+          subject: string
+        }
+        Insert: {
+          chapter_order: number
+          chapter_title_ar?: string | null
+          chapter_title_fr: string
+          created_at?: string
+          filiere?: string | null
+          id?: string
+          keywords?: string[]
+          level: string
+          notes?: string | null
+          subject: string
+        }
+        Update: {
+          chapter_order?: number
+          chapter_title_ar?: string | null
+          chapter_title_fr?: string
+          created_at?: string
+          filiere?: string | null
+          id?: string
+          keywords?: string[]
+          level?: string
+          notes?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
       exam_archive: {
         Row: {
           correction_url: string | null
@@ -1604,6 +1643,7 @@ export type Database = {
           credits: number
           exam_target: Database["public"]["Enums"]["exam_target"]
           perk_unlocked_until: string | null
+          preferred_language: string
           referral_code: string | null
           school_level: Database["public"]["Enums"]["school_level"] | null
           streak_days: number
@@ -1615,6 +1655,7 @@ export type Database = {
           credits?: number
           exam_target?: Database["public"]["Enums"]["exam_target"]
           perk_unlocked_until?: string | null
+          preferred_language?: string
           referral_code?: string | null
           school_level?: Database["public"]["Enums"]["school_level"] | null
           streak_days?: number
@@ -1626,6 +1667,7 @@ export type Database = {
           credits?: number
           exam_target?: Database["public"]["Enums"]["exam_target"]
           perk_unlocked_until?: string | null
+          preferred_language?: string
           referral_code?: string | null
           school_level?: Database["public"]["Enums"]["school_level"] | null
           streak_days?: number
