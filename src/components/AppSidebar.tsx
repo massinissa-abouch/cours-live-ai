@@ -3,6 +3,7 @@ import {
   Sparkles,
   LayoutDashboard,
   BookOpen,
+  Library,
   Video,
   Users,
   MessageSquare,
@@ -33,6 +34,7 @@ type NavItem = {
   url:
     | "/dashboard"
     | "/courses"
+    | "/library"
     | "/teachers"
     | "/ai"
     | "/tools"
@@ -47,6 +49,7 @@ type NavItem = {
 const primary: NavItem[] = [
   { title: "Accueil", url: "/dashboard", icon: LayoutDashboard },
   { title: "Tuteur IA", url: "/ai", icon: Sparkles },
+  { title: "Bibliothèque", url: "/library", icon: Library },
   { title: "Bibliothèque", url: "/courses", icon: BookOpen },
   { title: "Profs en direct", url: "/teachers", icon: Video },
   { title: "Outils", url: "/tools", icon: Wrench },

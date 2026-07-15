@@ -44,6 +44,7 @@ import { Route as AuthenticatedCommunityThreadIdRouteImport } from './routes/_au
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin_.moderation'
 import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin_.archive'
+import { Route as LibraryCycleLevelSlugSubjectSlugRouteImport } from './routes/library.$cycle.$levelSlug.$subjectSlug'
 import { Route as ApiPublicHooksTaskRemindersRouteImport } from './routes/api/public/hooks/task-reminders'
 import { Route as AuthenticatedToolsMemoSheetIdRouteImport } from './routes/_authenticated/tools.memo.$sheetId'
 import { Route as AuthenticatedTeacherCoursesNewRouteImport } from './routes/_authenticated/teacher.courses.new'
@@ -241,6 +242,12 @@ const AuthenticatedAdminArchiveRoute =
     path: '/admin/archive',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const LibraryCycleLevelSlugSubjectSlugRoute =
+  LibraryCycleLevelSlugSubjectSlugRouteImport.update({
+    id: '/$subjectSlug',
+    path: '/$subjectSlug',
+    getParentRoute: () => LibraryCycleLevelSlugRoute,
+  } as any)
 const ApiPublicHooksTaskRemindersRoute =
   ApiPublicHooksTaskRemindersRouteImport.update({
     id: '/api/public/hooks/task-reminders',
@@ -324,7 +331,7 @@ export interface FileRoutesByFullPath {
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
-  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRoute
+  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRouteWithChildren
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/community/': typeof AuthenticatedCommunityIndexRoute
   '/groups/': typeof AuthenticatedGroupsIndexRoute
@@ -338,6 +345,7 @@ export interface FileRoutesByFullPath {
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
   '/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
+  '/library/$cycle/$levelSlug/$subjectSlug': typeof LibraryCycleLevelSlugSubjectSlugRoute
   '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesByTo {
@@ -368,7 +376,7 @@ export interface FileRoutesByTo {
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
-  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRoute
+  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRouteWithChildren
   '/ai': typeof AuthenticatedAiIndexRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
   '/groups': typeof AuthenticatedGroupsIndexRoute
@@ -382,6 +390,7 @@ export interface FileRoutesByTo {
   '/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
   '/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
+  '/library/$cycle/$levelSlug/$subjectSlug': typeof LibraryCycleLevelSlugSubjectSlugRoute
   '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesById {
@@ -415,7 +424,7 @@ export interface FileRoutesById {
   '/_authenticated/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/_authenticated/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
-  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRoute
+  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRouteWithChildren
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
   '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
@@ -429,6 +438,7 @@ export interface FileRoutesById {
   '/_authenticated/teacher/courses/new': typeof AuthenticatedTeacherCoursesNewRoute
   '/_authenticated/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
+  '/library/$cycle/$levelSlug/$subjectSlug': typeof LibraryCycleLevelSlugSubjectSlugRoute
   '/_authenticated/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRouteTypes {
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/teacher/courses/new'
     | '/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
+    | '/library/$cycle/$levelSlug/$subjectSlug'
     | '/teacher/courses/$courseId/chapters'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -520,6 +531,7 @@ export interface FileRouteTypes {
     | '/teacher/courses/new'
     | '/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
+    | '/library/$cycle/$levelSlug/$subjectSlug'
     | '/teacher/courses/$courseId/chapters'
   id:
     | '__root__'
@@ -566,6 +578,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/courses/new'
     | '/_authenticated/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
+    | '/library/$cycle/$levelSlug/$subjectSlug'
     | '/_authenticated/teacher/courses/$courseId/chapters'
   fileRoutesById: FileRoutesById
 }
@@ -830,6 +843,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminArchiveRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/library/$cycle/$levelSlug/$subjectSlug': {
+      id: '/library/$cycle/$levelSlug/$subjectSlug'
+      path: '/$subjectSlug'
+      fullPath: '/library/$cycle/$levelSlug/$subjectSlug'
+      preLoaderRoute: typeof LibraryCycleLevelSlugSubjectSlugRouteImport
+      parentRoute: typeof LibraryCycleLevelSlugRoute
+    }
     '/api/public/hooks/task-reminders': {
       id: '/api/public/hooks/task-reminders'
       path: '/api/public/hooks/task-reminders'
@@ -1013,12 +1033,25 @@ const CoursesRouteChildren: CoursesRouteChildren = {
 const CoursesRouteWithChildren =
   CoursesRoute._addFileChildren(CoursesRouteChildren)
 
+interface LibraryCycleLevelSlugRouteChildren {
+  LibraryCycleLevelSlugSubjectSlugRoute: typeof LibraryCycleLevelSlugSubjectSlugRoute
+}
+
+const LibraryCycleLevelSlugRouteChildren: LibraryCycleLevelSlugRouteChildren = {
+  LibraryCycleLevelSlugSubjectSlugRoute: LibraryCycleLevelSlugSubjectSlugRoute,
+}
+
+const LibraryCycleLevelSlugRouteWithChildren =
+  LibraryCycleLevelSlugRoute._addFileChildren(
+    LibraryCycleLevelSlugRouteChildren,
+  )
+
 interface LibraryCycleRouteChildren {
-  LibraryCycleLevelSlugRoute: typeof LibraryCycleLevelSlugRoute
+  LibraryCycleLevelSlugRoute: typeof LibraryCycleLevelSlugRouteWithChildren
 }
 
 const LibraryCycleRouteChildren: LibraryCycleRouteChildren = {
-  LibraryCycleLevelSlugRoute: LibraryCycleLevelSlugRoute,
+  LibraryCycleLevelSlugRoute: LibraryCycleLevelSlugRouteWithChildren,
 }
 
 const LibraryCycleRouteWithChildren = LibraryCycleRoute._addFileChildren(
