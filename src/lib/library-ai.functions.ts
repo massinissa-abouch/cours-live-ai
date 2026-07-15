@@ -30,10 +30,14 @@ export const getChapterAi = createServerFn({ method: "POST" })
     return { content: (row.ai_content as ChapterAi | null) ?? null };
   });
 
-async function loadChapterContext(
-  supabase: typeof import("@/integrations/supabase/client").supabase,
-  chapterId: string,
-) {
+type SB = Parameters<Parameters<typeof requireSupabaseAuth.server>[0]>[0] extends {
+  context: { supabase: infer S };
+}
+  ? S
+  : never;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function loadChapterContext(supabase: any, chapterId: string) {
   const { data: chap } = await supabase
     .from("edu_chapters")
     .select("id,title_fr,summary_fr,subject_id")
@@ -47,7 +51,7 @@ async function loadChapterContext(
     .maybeSingle();
   const { data: lvl } = subj
     ? await supabase.from("edu_levels").select("label_fr").eq("id", subj.level_id).maybeSingle()
-    : { data: null };
+    : { data: null as { label_fr: string } | null };
   return {
     chapter: chap,
     subjectName: subj?.name_fr ?? "",
