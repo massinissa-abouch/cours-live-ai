@@ -130,9 +130,9 @@ function Dashboard() {
                 style={{ animationDelay: `${i * 40}ms` }}
                 className={`group animate-fade-in relative overflow-hidden rounded-3xl border p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)] ${
                   isFeature
-                    ? "border-primary/30 bg-emerald-gradient/15 sm:col-span-2 lg:row-span-2 shadow-glow"
+                    ? "border-primary/30 bg-primary/10 sm:col-span-2 lg:row-span-2 shadow-glow"
                     : isAccent
-                      ? "border-accent/30 bg-amber-gradient/10 lg:col-span-2"
+                      ? "border-accent/30 bg-accent/10 lg:col-span-2"
                       : "border-border bg-card hover:border-primary/40"
                 }`}
               >
@@ -207,7 +207,7 @@ function Dashboard() {
                 {upcoming.map((b) => (
                   <Link key={b.id} to="/live/$sessionId" params={{ sessionId: b.session!.id }}
                     className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition hover:border-primary/40 hover:bg-card/80">
-                    <div className="grid h-11 w-11 place-items-center rounded-xl bg-emerald-gradient/15 text-primary"><Video className="h-4 w-4" /></div>
+                    <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary"><Video className="h-4 w-4" /></div>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-semibold">{b.session!.title ?? b.session!.subject}</div>
                       <div className="text-xs text-muted-foreground inline-flex items-center gap-1">

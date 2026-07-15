@@ -163,7 +163,7 @@ export function AppSidebar({ userId }: { userId: string }) {
 
       <SidebarFooter className="border-t border-sidebar-border/60 p-3">
         {!collapsed && (
-          <div className="rounded-xl border border-primary/20 bg-emerald-gradient/10 p-3 text-xs">
+          <div className="rounded-xl border border-primary/20 bg-primary/10 p-3 text-xs">
             <div className="font-semibold text-primary">Estadi Premium</div>
             <div className="mt-0.5 text-muted-foreground">
               Invite 3 amis pour débloquer 7 jours illimités.
