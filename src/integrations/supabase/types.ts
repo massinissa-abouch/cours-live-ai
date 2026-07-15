@@ -663,6 +663,142 @@ export type Database = {
         }
         Relationships: []
       }
+      edu_chapters: {
+        Row: {
+          ai_content: Json | null
+          ai_generated_at: string | null
+          created_at: string
+          id: string
+          order_index: number
+          subject_id: string
+          summary_ar: string | null
+          summary_fr: string | null
+          title_ar: string
+          title_fr: string
+          updated_at: string
+        }
+        Insert: {
+          ai_content?: Json | null
+          ai_generated_at?: string | null
+          created_at?: string
+          id?: string
+          order_index?: number
+          subject_id: string
+          summary_ar?: string | null
+          summary_fr?: string | null
+          title_ar: string
+          title_fr: string
+          updated_at?: string
+        }
+        Update: {
+          ai_content?: Json | null
+          ai_generated_at?: string | null
+          created_at?: string
+          id?: string
+          order_index?: number
+          subject_id?: string
+          summary_ar?: string | null
+          summary_fr?: string | null
+          title_ar?: string
+          title_fr?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_chapters_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "edu_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edu_levels: {
+        Row: {
+          created_at: string
+          cycle: string
+          grade: string
+          id: string
+          label_ar: string
+          label_fr: string
+          order_index: number
+          slug: string
+          track: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cycle: string
+          grade: string
+          id?: string
+          label_ar: string
+          label_fr: string
+          order_index?: number
+          slug: string
+          track?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cycle?: string
+          grade?: string
+          id?: string
+          label_ar?: string
+          label_fr?: string
+          order_index?: number
+          slug?: string
+          track?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      edu_subjects: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          level_id: string
+          name_ar: string
+          name_fr: string
+          order_index: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          level_id: string
+          name_ar: string
+          name_fr: string
+          order_index?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          level_id?: string
+          name_ar?: string
+          name_fr?: string
+          order_index?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_subjects_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "edu_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exam_archive: {
         Row: {
           correction_url: string | null
