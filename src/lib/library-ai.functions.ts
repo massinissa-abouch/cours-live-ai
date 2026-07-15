@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText, Output } from "ai";
+import { generateText, NoObjectGeneratedError, Output } from "ai";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
@@ -67,7 +67,7 @@ const ExerciseSchema = z.object({
 
 const GeneratedSchema = z.object({
   explanation: z.string(),
-  exercises: z.array(ExerciseSchema).length(3),
+  exercises: z.array(ExerciseSchema),
 });
 
 const Eli5Schema = z.object({ eli5: z.string() });
@@ -93,31 +93,43 @@ export const generateChapterAi = createServerFn({ method: "POST" })
     // Highest quality Gemini available in the gateway catalog.
     const model = gateway("google/gemini-3.1-pro-preview");
 
+    // Admin client required because edu_chapters UPDATE policy is admin-only.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
     if (data.eli5) {
       if (!existing) throw new Error("Génère d'abord l'explication.");
-      const { output } = await generateText({
-        model,
-        output: Output.object({ schema: Eli5Schema }),
-        system: `Tu es Ostadi, tuteur IA pour élèves algériens. Réponds en français simple (niveau ELI5, comme à un enfant de 10 ans).
+      let eli5Text = "";
+      try {
+        const { output } = await generateText({
+          model,
+          output: Output.object({ schema: Eli5Schema }),
+          system: `Tu es Ostadi, tuteur IA pour élèves algériens. Réponds en français simple (niveau ELI5, comme à un enfant de 10 ans).
 Utilise Markdown (### titres, listes, **gras**). Formules LaTeX \\( ... \\) si nécessaire.`,
-        prompt: `Réexplique le chapitre "${ctx.chapter.title_fr}" (${ctx.subjectName}, ${ctx.levelLabel}) de façon TRÈS SIMPLE, avec des analogies du quotidien. Reste rigoureux mais accessible.`,
-      });
-      const next: ChapterAi = { ...existing, eli5: output.eli5 };
-      await context.supabase
+          prompt: `Réexplique le chapitre "${ctx.chapter.title_fr}" (${ctx.subjectName}, ${ctx.levelLabel}) de façon TRÈS SIMPLE, avec des analogies du quotidien. Reste rigoureux mais accessible.`,
+        });
+        eli5Text = output.eli5;
+      } catch (error) {
+        if (NoObjectGeneratedError.isInstance(error)) eli5Text = error.text ?? "";
+        else throw error;
+      }
+      const next: ChapterAi = { ...existing, eli5: eli5Text };
+      await supabaseAdmin
         .from("edu_chapters")
         .update({ ai_content: next as never, ai_generated_at: new Date().toISOString() })
         .eq("id", data.chapterId);
       return { content: next };
     }
 
-    const { output } = await generateText({
-      model,
-      output: Output.object({ schema: GeneratedSchema }),
-      system: `Tu es Ostadi, tuteur IA rigoureux pour élèves algériens (programme officiel).
+    let generated: { explanation: string; exercises: Exercise[] };
+    try {
+      const { output } = await generateText({
+        model,
+        output: Output.object({ schema: GeneratedSchema }),
+        system: `Tu es Ostadi, tuteur IA rigoureux pour élèves algériens (programme officiel).
 Réponds en français. Utilise Markdown (### titres, listes, **gras**). Formules mathématiques en LaTeX inline \\( ... \\) ou bloc $$ ... $$.
 Structure de l'explication : introduction, définitions clés, points essentiels, exemple résolu, à retenir.
-Les 3 exercices doivent être progressifs (facile / moyen / plus corsé) et adaptés au niveau. Chaque correction est complète et pédagogique.`,
-      prompt: `Chapitre : "${ctx.chapter.title_fr}"
+Fournis EXACTEMENT 3 exercices progressifs (facile / moyen / plus corsé) adaptés au niveau. Chaque correction est complète et pédagogique.`,
+        prompt: `Chapitre : "${ctx.chapter.title_fr}"
 Matière : ${ctx.subjectName}
 Niveau : ${ctx.levelLabel}
 ${ctx.chapter.summary_fr ? `Résumé officiel : ${ctx.chapter.summary_fr}` : ""}
@@ -125,16 +137,35 @@ ${ctx.chapter.summary_fr ? `Résumé officiel : ${ctx.chapter.summary_fr}` : ""}
 Produis :
 1. Une explication complète et structurée du chapitre.
 2. Exactement 3 exercices d'application avec correction détaillée.`,
-    });
+      });
+      generated = {
+        explanation: output.explanation,
+        exercises: output.exercises.slice(0, 3),
+      };
+    } catch (error) {
+      if (NoObjectGeneratedError.isInstance(error)) {
+        try {
+          const parsed = JSON.parse(error.text ?? "{}");
+          generated = {
+            explanation: String(parsed.explanation ?? ""),
+            exercises: Array.isArray(parsed.exercises) ? parsed.exercises.slice(0, 3) : [],
+          };
+        } catch {
+          throw new Error("La génération IA a échoué, réessaie.");
+        }
+      } else {
+        throw error;
+      }
+    }
 
     const next: ChapterAi = {
-      explanation: output.explanation,
-      exercises: output.exercises,
+      explanation: generated.explanation,
+      exercises: generated.exercises,
       eli5: existing?.eli5,
       model: "google/gemini-3.1-pro-preview",
     };
 
-    await context.supabase
+    await supabaseAdmin
       .from("edu_chapters")
       .update({ ai_content: next as never, ai_generated_at: new Date().toISOString() })
       .eq("id", data.chapterId);
