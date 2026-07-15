@@ -17,7 +17,6 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as SessionsSessionIdRouteImport } from './routes/sessions.$sessionId'
-import { Route as LibraryCycleRouteImport } from './routes/library.$cycle'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
@@ -25,12 +24,12 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedArchiveRouteImport } from './routes/_authenticated/archive'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as LibraryCycleIndexRouteImport } from './routes/library.$cycle.index'
 import { Route as AuthenticatedToolsIndexRouteImport } from './routes/_authenticated/tools.index'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher.index'
 import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenticated/groups.index'
 import { Route as AuthenticatedCommunityIndexRouteImport } from './routes/_authenticated/community.index'
 import { Route as AuthenticatedAiIndexRouteImport } from './routes/_authenticated/ai.index'
-import { Route as LibraryCycleLevelSlugRouteImport } from './routes/library.$cycle.$levelSlug'
 import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat.$conversationId'
 import { Route as AuthenticatedToolsMemoRouteImport } from './routes/_authenticated/tools.memo'
 import { Route as AuthenticatedToolsHomeworkRouteImport } from './routes/_authenticated/tools.homework'
@@ -44,6 +43,7 @@ import { Route as AuthenticatedCommunityThreadIdRouteImport } from './routes/_au
 import { Route as AuthenticatedAiSheetsRouteImport } from './routes/_authenticated/ai.sheets'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin_.moderation'
 import { Route as AuthenticatedAdminArchiveRouteImport } from './routes/_authenticated/admin_.archive'
+import { Route as LibraryCycleLevelSlugIndexRouteImport } from './routes/library.$cycle.$levelSlug.index'
 import { Route as LibraryCycleLevelSlugSubjectSlugRouteImport } from './routes/library.$cycle.$levelSlug.$subjectSlug'
 import { Route as ApiPublicHooksTaskRemindersRouteImport } from './routes/api/public/hooks/task-reminders'
 import { Route as AuthenticatedToolsMemoSheetIdRouteImport } from './routes/_authenticated/tools.memo.$sheetId'
@@ -94,11 +94,6 @@ const SessionsSessionIdRoute = SessionsSessionIdRouteImport.update({
   path: '/sessions/$sessionId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LibraryCycleRoute = LibraryCycleRouteImport.update({
-  id: '/library/$cycle',
-  path: '/library/$cycle',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
   id: '/$courseId',
   path: '/$courseId',
@@ -134,6 +129,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const LibraryCycleIndexRoute = LibraryCycleIndexRouteImport.update({
+  id: '/library/$cycle/',
+  path: '/library/$cycle/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedToolsIndexRoute = AuthenticatedToolsIndexRouteImport.update({
   id: '/tools/',
   path: '/tools/',
@@ -161,11 +161,6 @@ const AuthenticatedAiIndexRoute = AuthenticatedAiIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAiRoute,
-} as any)
-const LibraryCycleLevelSlugRoute = LibraryCycleLevelSlugRouteImport.update({
-  id: '/$levelSlug',
-  path: '/$levelSlug',
-  getParentRoute: () => LibraryCycleRoute,
 } as any)
 const ApiChatConversationIdRoute = ApiChatConversationIdRouteImport.update({
   id: '/api/chat/$conversationId',
@@ -242,11 +237,17 @@ const AuthenticatedAdminArchiveRoute =
     path: '/admin/archive',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const LibraryCycleLevelSlugIndexRoute =
+  LibraryCycleLevelSlugIndexRouteImport.update({
+    id: '/library/$cycle/$levelSlug/',
+    path: '/library/$cycle/$levelSlug/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LibraryCycleLevelSlugSubjectSlugRoute =
   LibraryCycleLevelSlugSubjectSlugRouteImport.update({
-    id: '/$subjectSlug',
-    path: '/$subjectSlug',
-    getParentRoute: () => LibraryCycleLevelSlugRoute,
+    id: '/library/$cycle/$levelSlug/$subjectSlug',
+    path: '/library/$cycle/$levelSlug/$subjectSlug',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksTaskRemindersRoute =
   ApiPublicHooksTaskRemindersRouteImport.update({
@@ -315,7 +316,6 @@ export interface FileRoutesByFullPath {
   '/invite': typeof AuthenticatedInviteRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
-  '/library/$cycle': typeof LibraryCycleRouteWithChildren
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/library/': typeof LibraryIndexRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
@@ -331,12 +331,12 @@ export interface FileRoutesByFullPath {
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
-  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRouteWithChildren
   '/ai/': typeof AuthenticatedAiIndexRoute
   '/community/': typeof AuthenticatedCommunityIndexRoute
   '/groups/': typeof AuthenticatedGroupsIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/tools/': typeof AuthenticatedToolsIndexRoute
+  '/library/$cycle/': typeof LibraryCycleIndexRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -346,6 +346,7 @@ export interface FileRoutesByFullPath {
   '/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/library/$cycle/$levelSlug/$subjectSlug': typeof LibraryCycleLevelSlugSubjectSlugRoute
+  '/library/$cycle/$levelSlug/': typeof LibraryCycleLevelSlugIndexRoute
   '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesByTo {
@@ -360,7 +361,6 @@ export interface FileRoutesByTo {
   '/invite': typeof AuthenticatedInviteRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
-  '/library/$cycle': typeof LibraryCycleRouteWithChildren
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/library': typeof LibraryIndexRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
@@ -376,12 +376,12 @@ export interface FileRoutesByTo {
   '/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
-  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRouteWithChildren
   '/ai': typeof AuthenticatedAiIndexRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
   '/groups': typeof AuthenticatedGroupsIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/tools': typeof AuthenticatedToolsIndexRoute
+  '/library/$cycle': typeof LibraryCycleIndexRoute
   '/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -391,6 +391,7 @@ export interface FileRoutesByTo {
   '/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/library/$cycle/$levelSlug/$subjectSlug': typeof LibraryCycleLevelSlugSubjectSlugRoute
+  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugIndexRoute
   '/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRoutesById {
@@ -408,7 +409,6 @@ export interface FileRoutesById {
   '/_authenticated/invite': typeof AuthenticatedInviteRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
-  '/library/$cycle': typeof LibraryCycleRouteWithChildren
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/library/': typeof LibraryIndexRoute
   '/_authenticated/admin_/archive': typeof AuthenticatedAdminArchiveRoute
@@ -424,12 +424,12 @@ export interface FileRoutesById {
   '/_authenticated/tools/homework': typeof AuthenticatedToolsHomeworkRoute
   '/_authenticated/tools/memo': typeof AuthenticatedToolsMemoRouteWithChildren
   '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
-  '/library/$cycle/$levelSlug': typeof LibraryCycleLevelSlugRouteWithChildren
   '/_authenticated/ai/': typeof AuthenticatedAiIndexRoute
   '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
   '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/tools/': typeof AuthenticatedToolsIndexRoute
+  '/library/$cycle/': typeof LibraryCycleIndexRoute
   '/_authenticated/ai/c/$conversationId': typeof AuthenticatedAiCConversationIdRoute
   '/_authenticated/ai/exam/$examId': typeof AuthenticatedAiExamExamIdRoute
   '/_authenticated/ai/exam/new': typeof AuthenticatedAiExamNewRoute
@@ -439,6 +439,7 @@ export interface FileRoutesById {
   '/_authenticated/tools/memo/$sheetId': typeof AuthenticatedToolsMemoSheetIdRoute
   '/api/public/hooks/task-reminders': typeof ApiPublicHooksTaskRemindersRoute
   '/library/$cycle/$levelSlug/$subjectSlug': typeof LibraryCycleLevelSlugSubjectSlugRoute
+  '/library/$cycle/$levelSlug/': typeof LibraryCycleLevelSlugIndexRoute
   '/_authenticated/teacher/courses/$courseId/chapters': typeof AuthenticatedTeacherCoursesCourseIdChaptersRoute
 }
 export interface FileRouteTypes {
@@ -456,7 +457,6 @@ export interface FileRouteTypes {
     | '/invite'
     | '/onboarding'
     | '/courses/$courseId'
-    | '/library/$cycle'
     | '/sessions/$sessionId'
     | '/library/'
     | '/admin/archive'
@@ -472,12 +472,12 @@ export interface FileRouteTypes {
     | '/tools/homework'
     | '/tools/memo'
     | '/api/chat/$conversationId'
-    | '/library/$cycle/$levelSlug'
     | '/ai/'
     | '/community/'
     | '/groups/'
     | '/teacher/'
     | '/tools/'
+    | '/library/$cycle/'
     | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
@@ -487,6 +487,7 @@ export interface FileRouteTypes {
     | '/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
     | '/library/$cycle/$levelSlug/$subjectSlug'
+    | '/library/$cycle/$levelSlug/'
     | '/teacher/courses/$courseId/chapters'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -501,7 +502,6 @@ export interface FileRouteTypes {
     | '/invite'
     | '/onboarding'
     | '/courses/$courseId'
-    | '/library/$cycle'
     | '/sessions/$sessionId'
     | '/library'
     | '/admin/archive'
@@ -517,12 +517,12 @@ export interface FileRouteTypes {
     | '/tools/homework'
     | '/tools/memo'
     | '/api/chat/$conversationId'
-    | '/library/$cycle/$levelSlug'
     | '/ai'
     | '/community'
     | '/groups'
     | '/teacher'
     | '/tools'
+    | '/library/$cycle'
     | '/ai/c/$conversationId'
     | '/ai/exam/$examId'
     | '/ai/exam/new'
@@ -532,6 +532,7 @@ export interface FileRouteTypes {
     | '/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
     | '/library/$cycle/$levelSlug/$subjectSlug'
+    | '/library/$cycle/$levelSlug'
     | '/teacher/courses/$courseId/chapters'
   id:
     | '__root__'
@@ -548,7 +549,6 @@ export interface FileRouteTypes {
     | '/_authenticated/invite'
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
-    | '/library/$cycle'
     | '/sessions/$sessionId'
     | '/library/'
     | '/_authenticated/admin_/archive'
@@ -564,12 +564,12 @@ export interface FileRouteTypes {
     | '/_authenticated/tools/homework'
     | '/_authenticated/tools/memo'
     | '/api/chat/$conversationId'
-    | '/library/$cycle/$levelSlug'
     | '/_authenticated/ai/'
     | '/_authenticated/community/'
     | '/_authenticated/groups/'
     | '/_authenticated/teacher/'
     | '/_authenticated/tools/'
+    | '/library/$cycle/'
     | '/_authenticated/ai/c/$conversationId'
     | '/_authenticated/ai/exam/$examId'
     | '/_authenticated/ai/exam/new'
@@ -579,6 +579,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tools/memo/$sheetId'
     | '/api/public/hooks/task-reminders'
     | '/library/$cycle/$levelSlug/$subjectSlug'
+    | '/library/$cycle/$levelSlug/'
     | '/_authenticated/teacher/courses/$courseId/chapters'
   fileRoutesById: FileRoutesById
 }
@@ -589,11 +590,13 @@ export interface RootRouteChildren {
   CoursesRoute: typeof CoursesRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TeachersRoute: typeof TeachersRoute
-  LibraryCycleRoute: typeof LibraryCycleRouteWithChildren
   SessionsSessionIdRoute: typeof SessionsSessionIdRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   ApiChatConversationIdRoute: typeof ApiChatConversationIdRoute
+  LibraryCycleIndexRoute: typeof LibraryCycleIndexRoute
   ApiPublicHooksTaskRemindersRoute: typeof ApiPublicHooksTaskRemindersRoute
+  LibraryCycleLevelSlugSubjectSlugRoute: typeof LibraryCycleLevelSlugSubjectSlugRoute
+  LibraryCycleLevelSlugIndexRoute: typeof LibraryCycleLevelSlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -654,13 +657,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionsSessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/library/$cycle': {
-      id: '/library/$cycle'
-      path: '/library/$cycle'
-      fullPath: '/library/$cycle'
-      preLoaderRoute: typeof LibraryCycleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/courses/$courseId': {
       id: '/courses/$courseId'
       path: '/$courseId'
@@ -710,6 +706,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/library/$cycle/': {
+      id: '/library/$cycle/'
+      path: '/library/$cycle'
+      fullPath: '/library/$cycle/'
+      preLoaderRoute: typeof LibraryCycleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/tools/': {
       id: '/_authenticated/tools/'
       path: '/tools'
@@ -744,13 +747,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/ai/'
       preLoaderRoute: typeof AuthenticatedAiIndexRouteImport
       parentRoute: typeof AuthenticatedAiRoute
-    }
-    '/library/$cycle/$levelSlug': {
-      id: '/library/$cycle/$levelSlug'
-      path: '/$levelSlug'
-      fullPath: '/library/$cycle/$levelSlug'
-      preLoaderRoute: typeof LibraryCycleLevelSlugRouteImport
-      parentRoute: typeof LibraryCycleRoute
     }
     '/api/chat/$conversationId': {
       id: '/api/chat/$conversationId'
@@ -843,12 +839,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminArchiveRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/library/$cycle/$levelSlug/': {
+      id: '/library/$cycle/$levelSlug/'
+      path: '/library/$cycle/$levelSlug'
+      fullPath: '/library/$cycle/$levelSlug/'
+      preLoaderRoute: typeof LibraryCycleLevelSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library/$cycle/$levelSlug/$subjectSlug': {
       id: '/library/$cycle/$levelSlug/$subjectSlug'
-      path: '/$subjectSlug'
+      path: '/library/$cycle/$levelSlug/$subjectSlug'
       fullPath: '/library/$cycle/$levelSlug/$subjectSlug'
       preLoaderRoute: typeof LibraryCycleLevelSlugSubjectSlugRouteImport
-      parentRoute: typeof LibraryCycleLevelSlugRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/task-reminders': {
       id: '/api/public/hooks/task-reminders'
@@ -1033,31 +1036,6 @@ const CoursesRouteChildren: CoursesRouteChildren = {
 const CoursesRouteWithChildren =
   CoursesRoute._addFileChildren(CoursesRouteChildren)
 
-interface LibraryCycleLevelSlugRouteChildren {
-  LibraryCycleLevelSlugSubjectSlugRoute: typeof LibraryCycleLevelSlugSubjectSlugRoute
-}
-
-const LibraryCycleLevelSlugRouteChildren: LibraryCycleLevelSlugRouteChildren = {
-  LibraryCycleLevelSlugSubjectSlugRoute: LibraryCycleLevelSlugSubjectSlugRoute,
-}
-
-const LibraryCycleLevelSlugRouteWithChildren =
-  LibraryCycleLevelSlugRoute._addFileChildren(
-    LibraryCycleLevelSlugRouteChildren,
-  )
-
-interface LibraryCycleRouteChildren {
-  LibraryCycleLevelSlugRoute: typeof LibraryCycleLevelSlugRouteWithChildren
-}
-
-const LibraryCycleRouteChildren: LibraryCycleRouteChildren = {
-  LibraryCycleLevelSlugRoute: LibraryCycleLevelSlugRouteWithChildren,
-}
-
-const LibraryCycleRouteWithChildren = LibraryCycleRoute._addFileChildren(
-  LibraryCycleRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -1065,22 +1043,14 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesRoute: CoursesRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TeachersRoute: TeachersRoute,
-  LibraryCycleRoute: LibraryCycleRouteWithChildren,
   SessionsSessionIdRoute: SessionsSessionIdRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   ApiChatConversationIdRoute: ApiChatConversationIdRoute,
+  LibraryCycleIndexRoute: LibraryCycleIndexRoute,
   ApiPublicHooksTaskRemindersRoute: ApiPublicHooksTaskRemindersRoute,
+  LibraryCycleLevelSlugSubjectSlugRoute: LibraryCycleLevelSlugSubjectSlugRoute,
+  LibraryCycleLevelSlugIndexRoute: LibraryCycleLevelSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n/provider";
 
-export const Route = createFileRoute("/library/$cycle/$levelSlug")({
+export const Route = createFileRoute("/library/$cycle/$levelSlug/")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.levelSlug} — Matières | Ostadi` },

@@ -10,7 +10,7 @@ const CYCLE_LABELS: Record<string, { fr: string; ar: string }> = {
   lycee: { fr: "Lycée", ar: "الثانوي" },
 };
 
-export const Route = createFileRoute("/library/$cycle")({
+export const Route = createFileRoute("/library/$cycle/")({
   head: ({ params }) => ({
     meta: [
       { title: `${CYCLE_LABELS[params.cycle]?.fr ?? "Cycle"} — Bibliothèque | Ostadi` },
