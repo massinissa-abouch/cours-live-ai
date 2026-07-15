@@ -1,49 +1,59 @@
-Tu m'as envoyé 5 gros lots de fonctionnalités d'un coup. Techniquement c'est faisable, mais ça représente ~15-20 nouvelles tables, ~30 nouvelles routes, et une dizaine de flux IA. Le livrer en un seul "go" garantit des régressions et un review impossible. Je te propose de découper en 5 livraisons indépendantes, dans l'ordre de valeur produit.
+# Refonte Estadi — plan en 4 vagues
 
-## Ordre de livraison proposé
+## Pourquoi pas "tout d'un coup"
 
-**Livraison 1 — Outils élève (Prompt 4)** — base utile immédiatement
-- Chat IA curriculum (déjà en place → j'ajoute sélecteur matière/niveau + prompt aligné BEM/BAC officiel)
-- Calculateur moyenne BEM & BAC (coefficients officiels par filière, 100% front, pas de DB)
-- Compte à rebours examen + checklist chapitres (table `exam_countdowns` existe déjà, à câbler)
-- Banque d'exercices par chapitre (QCM instantané + rédigé corrigé IA) — table `ai_exercises` déjà là
+Ton prompt couvre 17 espaces, ~40 tables, une refonte design complète et de la génération IA de contenu. Livré en une seule fois, ça veut dire :
+- Des milliers de lignes de code touchées en une passe → bugs garantis sur l'existant (IA, groupes, communauté, outils qui marchent aujourd'hui).
+- Impossible à tester / valider pour toi entre chaque étape.
+- Un coût IA imprévisible si on lance la génération auto sur 116 chapitres × 6 artefacts (résumé/flashcards/quiz…).
+- Beaucoup de features existent déjà — les refaire = régression, pas progrès.
 
-**Livraison 2 — Archive Bac & BEM + IA (Prompt 1)**
-- Table `exam_archive` (type, année, matière, filière, pdf_url, correction_url)
-- Bucket storage `exam-archive` (public read)
-- Route `/archive` avec filtres année/matière/type
-- Bouton "Aide IA" → ouvre chat contextualisé (matière + année + sujet)
-- Note: je ne peux pas fournir les PDFs officiels moi-même. Il faudra soit que tu les uploades, soit que je crée un back-office admin d'upload + un seed d'exemple. → à confirmer
+Je livre donc **par vagues courtes** (chacune testable et déployable), en réutilisant l'existant.
 
-**Livraison 3 — Croissance (Prompt 5)**
-- Streak quotidien (table + trigger sur activité)
-- Génération image de résultat partageable (canvas côté client → PNG)
-- Parrainage: table `referrals` existe → route `/invite` + déblocage 7j après 3 filleuls inscrits
+## Vague 1 — Design system Émeraude & Nuit + refonte du shell (MAINTENANT)
 
-**Livraison 4 — Groupes de révision privés (Prompt 2)**
-- Tables `study_groups`, `group_members` (code invitation unique), `group_messages`, `group_resources`, `group_events`, `group_exam_alerts`
-- Chat temps réel (Realtime), partage ressources (storage bucket privé au groupe), calendrier
-- Annonce contrôle → génération checklist + quiz IA visibles par le groupe
-- Mode Pomodoro synchro avec présence live (Realtime presence)
+Objectif : donner à Estadi une identité visuelle premium (Apple/Linear feel), sans toucher à la logique métier.
 
-**Livraison 5 — Espace communautaire public (Prompt 3)**
-- Tables `community_threads`, `community_posts`, `post_reports`
-- Fils par matière×niveau, tri récents/populaires
-- Rate limiting (max N messages/heure via check côté serverFn)
-- Bouton signalement + queue modération admin
-- Pas de DM: enforced par absence de route DM
+- **Design tokens** dans `src/styles.css` : palette Émeraude `#10B981` (primary) / Nuit `#0B1220` (bg dark) / Blanc cassé `#F8FAFC` / Ambre `#F59E0B` (accent), en oklch. Mode sombre par défaut, mode clair soigné. Ombres, gradients, radii premium.
+- **Typo** : Inter Tight (titres) + Inter (corps), chargée dans `__root.tsx`.
+- **Nouveau shell d'app authentifié** : sidebar collapsible (shadcn Sidebar) avec sections Accueil / Cours / IA / Révisions / BAC & BEM / Communauté / Outils / Profil, header sticky avec streak+XP+notifs, breadcrumb, layout responsive mobile-first.
+- **Dashboard repensé** : hero "Bonjour X" + progression du jour + planning IA + streak + prochaines sessions + recommandations, cards en bento-grid avec Framer Motion (fade/scale au mount, hover-lift). Les données affichées viennent des tables existantes (gamification, bookings, enrollments, notifications).
+- **Ajustement des pages existantes** (cours, IA, outils, groupes, communauté, archive) pour utiliser les nouveaux tokens — aucune refonte fonctionnelle.
 
-## Ce que je ne fais PAS
-- Aucune modif du système de paiement (Chargily)
-- Je ne fabrique pas de faux contenu Bac/BEM (droits + exactitude)
+Livrable : app visuellement premium, cohérente clair/sombre, sans régression.
 
-## Détails techniques
-- Toutes les tables en RLS scoped `auth.uid()`, GRANT explicites
-- Server functions via `createServerFn` + `requireSupabaseAuth`
-- IA: on garde le routage hybride actuel (gemini-3.5-flash rapide / gpt-5 puissant)
-- Realtime activé uniquement sur `group_messages` et présence Pomodoro
+## Vague 2 — Bibliothèque de cours officielle (structure + génération IA à la demande)
 
-## Ma question
-Je démarre par la **Livraison 1 (Outils élève)** qui donne le plus de valeur immédiate à un élève seul sur l'app ? Ou tu préfères commencer par une autre (ex: Archive, si tu as déjà les PDFs prêts à uploader) ?
+- Nouvelles tables : `subjects`, `chapters` (déjà partiel dans `curriculum`), `lessons`, `lesson_variants` (résumé 5min / 1min / complet), `flashcards`, `quizzes`, `quiz_questions`, `exercises`, `exercise_solutions`. GRANTs + RLS (lecture publique authentifiée, écriture prof/admin).
+- Seed structurel : hiérarchie Primaire → CEM → Lycée (1AS/2AS/3AS × 6 filières) + chapitres officiels (extension du seed curriculum existant).
+- Pages : `/library`, `/library/$level`, `/library/$level/$subject`, `/library/$level/$subject/$chapter` avec onglets (Cours / Résumé / Flashcards / Quiz / Exercices / Annales liées).
+- **Génération IA à la demande** (pas en masse) : bouton "Générer avec l'IA" sur un chapitre, qui appelle une server function utilisant `google/gemini-3-flash-preview` avec le contexte curriculum + niveau, et persiste le résultat. Cache DB pour ne payer qu'une fois par chapitre.
+- Coût cadré : je n'auto-génère RIEN au déploiement — c'est toi ou tes profs qui déclenchez la génération chapitre par chapitre depuis l'admin.
 
-Réponds-moi simplement "1", "2", "3", "4" ou "5" (ou "1 puis 2" si tu veux enchaîner), et pour l'Archive, dis-moi si tu fournis les PDFs ou si je monte un back-office d'upload admin.
+## Vague 3 — Orientation post-BAC + universités algériennes
+
+- Tables : `universities` (nom, wilaya, type, présentation), `majors` (spécialité, université, seuils d'admission par année, débouchés, durée, salaire moyen).
+- Simulateur : l'élève entre moyenne + filière + wilaya → liste des universités/spécialités accessibles, triées par pertinence.
+- Pages fiche université / fiche spécialité avec photos, transport, résidences, journées portes ouvertes.
+- Seed initial minimal (grandes universités) — extensible par admin.
+
+## Vague 4 — Gamification avancée + statistiques
+
+- XP par action (leçon terminée, quiz réussi, exercice corrigé, streak) — étend la table `gamification` existante.
+- Badges, niveaux, classements (national / wilaya / école) via une nouvelle table `leaderboards` matérialisée.
+- Défis quotidiens/hebdo générés par un cron sur `/api/public/hooks/`.
+- Page stats : graphiques (recharts) évolution, moyenne, points forts/faibles, prévision BAC/BEM basée sur historique de quiz.
+
+## Ce que je NE fais pas (à cadrer plus tard, pas dans ce plan)
+
+- Espace Parent avancé (déjà partiel via `parent_child_links`).
+- Espace Enseignant refondu (déjà fonctionnel).
+- Scanner IA dédié (déjà couvert par le chat IA multimodal existant + cahier de textes).
+- Téléchargement hors ligne / PWA — feature à part entière.
+- Recherche vocale, mode concentration — polish à faire une fois le socle stable.
+
+## Question de validation
+
+Confirme que je pars sur la **Vague 1 uniquement** en premier (design system + shell + dashboard). Une fois validée visuellement par toi en preview, on enchaîne sur la Vague 2.
+
+Si tu veux vraiment tout d'un coup malgré le risque, dis-le explicitement et je le ferai — mais ce sera long, moins soigné, et tu ne pourras pas donner de feedback intermédiaire.
