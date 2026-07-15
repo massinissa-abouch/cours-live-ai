@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { MobileTabBar } from "@/components/MobileTabBar";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -51,9 +52,10 @@ function AuthenticatedShell() {
               </button>
             </div>
           </header>
-          <main className="flex-1">
+          <main className="flex-1 pb-20 md:pb-0">
             <Outlet />
           </main>
+          <MobileTabBar />
         </div>
       </div>
     </SidebarProvider>
