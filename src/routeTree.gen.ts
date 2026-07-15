@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as SessionsSessionIdRouteImport } from './routes/sessions.$sessionId'
+import { Route as LibraryCycleRouteImport } from './routes/library.$cycle'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
@@ -89,6 +90,11 @@ const LibraryIndexRoute = LibraryIndexRouteImport.update({
 const SessionsSessionIdRoute = SessionsSessionIdRouteImport.update({
   id: '/sessions/$sessionId',
   path: '/sessions/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryCycleRoute = LibraryCycleRouteImport.update({
+  id: '/library/$cycle',
+  path: '/library/$cycle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
@@ -296,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/invite': typeof AuthenticatedInviteRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/library/$cycle': typeof LibraryCycleRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/library/': typeof LibraryIndexRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
@@ -338,6 +345,7 @@ export interface FileRoutesByTo {
   '/invite': typeof AuthenticatedInviteRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/library/$cycle': typeof LibraryCycleRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/library': typeof LibraryIndexRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
@@ -383,6 +391,7 @@ export interface FileRoutesById {
   '/_authenticated/invite': typeof AuthenticatedInviteRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/library/$cycle': typeof LibraryCycleRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/library/': typeof LibraryIndexRoute
   '/_authenticated/admin_/archive': typeof AuthenticatedAdminArchiveRoute
@@ -428,6 +437,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/onboarding'
     | '/courses/$courseId'
+    | '/library/$cycle'
     | '/sessions/$sessionId'
     | '/library/'
     | '/admin/archive'
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/onboarding'
     | '/courses/$courseId'
+    | '/library/$cycle'
     | '/sessions/$sessionId'
     | '/library'
     | '/admin/archive'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/_authenticated/invite'
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
+    | '/library/$cycle'
     | '/sessions/$sessionId'
     | '/library/'
     | '/_authenticated/admin_/archive'
@@ -552,6 +564,7 @@ export interface RootRouteChildren {
   CoursesRoute: typeof CoursesRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TeachersRoute: typeof TeachersRoute
+  LibraryCycleRoute: typeof LibraryCycleRoute
   SessionsSessionIdRoute: typeof SessionsSessionIdRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   ApiChatConversationIdRoute: typeof ApiChatConversationIdRoute
@@ -614,6 +627,13 @@ declare module '@tanstack/react-router' {
       path: '/sessions/$sessionId'
       fullPath: '/sessions/$sessionId'
       preLoaderRoute: typeof SessionsSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/$cycle': {
+      id: '/library/$cycle'
+      path: '/library/$cycle'
+      fullPath: '/library/$cycle'
+      preLoaderRoute: typeof LibraryCycleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/courses/$courseId': {
@@ -981,6 +1001,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesRoute: CoursesRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TeachersRoute: TeachersRoute,
+  LibraryCycleRoute: LibraryCycleRoute,
   SessionsSessionIdRoute: SessionsSessionIdRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   ApiChatConversationIdRoute: ApiChatConversationIdRoute,
