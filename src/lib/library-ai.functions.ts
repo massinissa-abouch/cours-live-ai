@@ -30,12 +30,6 @@ export const getChapterAi = createServerFn({ method: "POST" })
     return { content: (row.ai_content as ChapterAi | null) ?? null };
   });
 
-type SB = Parameters<Parameters<typeof requireSupabaseAuth.server>[0]>[0] extends {
-  context: { supabase: infer S };
-}
-  ? S
-  : never;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function loadChapterContext(supabase: any, chapterId: string) {
   const { data: chap } = await supabase
