@@ -1,8 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, Wand2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n/provider";
+import { Button } from "@/components/ui/button";
+import { ChapterAiSheet } from "@/components/ChapterAiSheet";
 
 export const Route = createFileRoute("/library/$cycle/$levelSlug/$subjectSlug")({
   head: ({ params }) => ({
@@ -24,6 +26,7 @@ function SubjectChapters() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
   const [missing, setMissing] = useState(false);
+  const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -126,11 +129,36 @@ function SubjectChapters() {
                     </div>
                   )}
                 </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="shrink-0 border-primary/40 text-primary hover:bg-primary/10"
+                  onClick={() => setActiveChapter(c)}
+                >
+                  <Wand2 className="mr-1.5 h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">
+                    {lang === "ar" ? "اشرح لي بالذكاء" : "Explique-moi avec l'IA"}
+                  </span>
+                  <span className="sm:hidden">{lang === "ar" ? "اشرح" : "IA"}</span>
+                </Button>
               </li>
             ))}
           </ol>
         )}
       </main>
+
+      {activeChapter && subject && (
+        <ChapterAiSheet
+          chapterId={activeChapter.id}
+          chapterTitle={lang === "ar" ? activeChapter.title_ar : activeChapter.title_fr}
+          subjectName={lang === "ar" ? subject.name_ar : subject.name_fr}
+          levelLabel={
+            subject.level ? (lang === "ar" ? subject.level.label_ar : subject.level.label_fr) : ""
+          }
+          open={!!activeChapter}
+          onOpenChange={(v) => !v && setActiveChapter(null)}
+        />
+      )}
     </div>
   );
 }
