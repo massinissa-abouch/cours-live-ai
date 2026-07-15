@@ -2,14 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Video, Sparkles, LogOut, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench, Archive, Flame, Gift, Users, MessageSquare, ListChecks } from "lucide-react";
+import { BookOpen, Video, Sparkles, GraduationCap, Bell, Clock, ShieldAlert, TrendingUp, Wrench, Archive, Flame, Gift, Users, MessageSquare, ListChecks, ArrowRight } from "lucide-react";
 import { listMyEnrollments } from "@/lib/course.functions";
 import { listMyBookings } from "@/lib/live-session.functions";
 import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
 import { getAiCostSummary } from "@/lib/ai-cost.functions";
 import { pingStreak, getGrowthStatus } from "@/lib/growth.functions";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useT } from "@/lib/i18n/provider";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -22,7 +20,6 @@ type Notif = Awaited<ReturnType<typeof listMyNotifications>>[number];
 function Dashboard() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
-  const t = useT();
   const [isTeacher, setIsTeacher] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [aiCost, setAiCost] = useState<Awaited<ReturnType<typeof getAiCostSummary>> | null>(null);
@@ -63,11 +60,6 @@ function Dashboard() {
     })();
   }, [user.id, navigate, loadEnroll, loadBooks, loadNotif, loadCost, ping, loadGrowth]);
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/" });
-  }
-
   const now = Date.now();
   const upcoming = bookings
     .filter((b) => b.session && new Date(b.session.scheduled_at).getTime() >= now - 30 * 60_000)
@@ -76,96 +68,94 @@ function Dashboard() {
     .filter((b) => b.session && new Date(b.session.scheduled_at).getTime() < now - 30 * 60_000);
   const unread = notifs.filter((n) => !n.read_at).length;
 
-  const cards = [
-    { icon: ListChecks, title: "Cahier de textes", desc: "Photo → IA planifie et te rappelle avant l'échéance", to: "/tools/homework" as const },
-    { icon: BookOpen, title: "Catalogue de cours", desc: "Trouve un cours vidéo", to: "/courses" as const },
-    { icon: Video, title: "Trouver un prof", desc: "Réserve une session live", to: "/teachers" as const },
-    { icon: Sparkles, title: "Entraînement IA", desc: "Génère un exercice", to: "/ai" as const },
-    { icon: Wrench, title: "Outils élève", desc: "Moyenne, compte à rebours, banque d'exercices", to: "/tools" as const },
-    { icon: Archive, title: "Archive Bac & BEM", desc: "Sujets et corrigés officiels", to: "/archive" as const },
-    { icon: Users, title: "Groupes de révision", desc: "Chat, ressources & Pomodoro entre camarades", to: "/groups" as const },
-    { icon: MessageSquare, title: "Communauté", desc: "Pose une question aux autres élèves", to: "/community" as const },
+  const quickActions = [
+    { icon: Sparkles, title: "Tuteur IA", desc: "Explique-moi un chapitre, corrige-moi", to: "/ai" as const, tone: "primary" as const },
+    { icon: ListChecks, title: "Cahier de textes", desc: "Photo → planning IA", to: "/tools/homework" as const, tone: "accent" as const },
+    { icon: Archive, title: "Archive BAC & BEM", desc: "Annales & corrigés officiels", to: "/archive" as const, tone: "neutral" as const },
+    { icon: BookOpen, title: "Mes cours", desc: "Reprendre là où tu t'es arrêté", to: "/courses" as const, tone: "neutral" as const },
+    { icon: Video, title: "Réserver un prof", desc: "Session live 1-à-1", to: "/teachers" as const, tone: "neutral" as const },
+    { icon: Users, title: "Groupes d'étude", desc: "Réviser en équipe", to: "/groups" as const, tone: "neutral" as const },
+    { icon: MessageSquare, title: "Communauté", desc: "Pose une question", to: "/community" as const, tone: "neutral" as const },
+    { icon: Wrench, title: "Outils", desc: "Calculateur, compte à rebours…", to: "/tools" as const, tone: "neutral" as const },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground font-bold">أ</div>
-            <span className="font-semibold">Ostadi</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <button onClick={() => { setShowNotifs((s) => !s); if (unread) markRead({ data: { all: true } }).then(() => setNotifs((ns) => ns.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })))); }}
-                className="relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-secondary">
-                <Bell className="h-4 w-4" />
-                {unread > 0 && <span className="absolute -right-0.5 -top-0.5 h-4 min-w-4 rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground grid place-items-center">{unread}</span>}
-              </button>
-              {showNotifs && (
-                <div className="absolute right-0 top-full z-20 mt-2 w-80 rounded-2xl border border-border bg-card p-2 shadow-xl">
-                  {notifs.length === 0 ? (
-                    <div className="p-4 text-sm text-muted-foreground">Aucune notification.</div>
-                  ) : notifs.slice(0, 8).map((n) => (
-                    <Link key={n.id} to={n.link ?? "/dashboard"} onClick={() => setShowNotifs(false)}
-                      className="block rounded-lg px-3 py-2 hover:bg-secondary">
-                      <div className="text-sm font-medium">{n.title}</div>
-                      {n.body && <div className="text-xs text-muted-foreground line-clamp-2">{n.body}</div>}
-                      <div className="text-[10px] text-muted-foreground/70">{new Date(n.created_at).toLocaleString("fr-FR")}</div>
-                    </Link>
-                  ))}
-                </div>
+    <div className="min-h-full">
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-border/60 bg-hero">
+        <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(circle_at_1px_1px,oklch(1_0_0/0.06)_1px,transparent_0)] [background-size:24px_24px]" />
+        <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
+          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-primary/80">
+            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+            <span>Programme algérien officiel</span>
+          </div>
+          <h1 className="mt-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            Bonjour <span className="bg-emerald-gradient bg-clip-text text-transparent">{user.user_metadata?.full_name?.split(" ")[0] ?? "élève"}</span>.
+          </h1>
+          <p className="mt-3 max-w-xl text-base text-muted-foreground">
+            Prêt à progresser aujourd'hui ? Ton tuteur IA, tes cours et tes profs sont là.
+          </p>
+
+          {growth && (
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <StatPill icon={<Flame className="h-3.5 w-3.5" />} tone="amber">
+                {growth.streakDays > 0 ? `${growth.streakDays} jour${growth.streakDays > 1 ? "s" : ""} d'affilée` : "Démarre ton streak"}
+              </StatPill>
+              {growth.perkActive && (
+                <StatPill icon={<Sparkles className="h-3.5 w-3.5" />} tone="emerald">
+                  Accès illimité actif
+                </StatPill>
               )}
+              <StatPill icon={<Bell className="h-3.5 w-3.5" />} tone="neutral">
+                {unread} notif{unread > 1 ? "s" : ""} non lue{unread > 1 ? "s" : ""}
+              </StatPill>
+              <Link to="/invite" className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15">
+                <Gift className="h-3.5 w-3.5" /> Invite 3 amis → +7 jours ({growth.acceptedCount}/3)
+              </Link>
             </div>
-            <button onClick={signOut} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-secondary">
-              <LogOut className="h-4 w-4" /> {t("nav.logout")}
-            </button>
-            <LanguageSwitcher compact />
-          </div>
+          )}
         </div>
-      </header>
+      </section>
 
-      <main className="mx-auto max-w-6xl px-4 py-10">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Bonjour {user.user_metadata?.full_name ?? user.email} 👋
-        </h1>
-        <p className="mt-2 text-muted-foreground">Que veux-tu faire aujourd'hui ?</p>
-
-        {growth && (
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/40 bg-orange-500/10 px-4 py-2 text-sm font-semibold text-orange-600 dark:text-orange-300">
-              <Flame className="h-4 w-4" />
-              {growth.streakDays > 0 ? `${growth.streakDays} jour${growth.streakDays > 1 ? "s" : ""} de suite` : "Commence ton streak aujourd'hui !"}
-            </div>
-            {growth.perkActive && (
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-300">
-                <Sparkles className="h-3.5 w-3.5" /> Accès illimité actif
-              </div>
-            )}
-            <Link to="/invite" className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/15">
-              <Gift className="h-3.5 w-3.5" /> Invite 3 amis → +7 jours ({growth.acceptedCount}/3)
-            </Link>
-          </div>
-        )}
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {cards.map((c) => (
-            <Link
-              key={c.title} to={c.to}
-              className="group rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
-            >
-              <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-secondary text-primary">
-                <c.icon className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-semibold">{c.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{c.desc}</p>
-            </Link>
-          ))}
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+        {/* Bento quick actions */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[minmax(140px,1fr)]">
+          {quickActions.map((c, i) => {
+            const isFeature = c.tone === "primary";
+            const isAccent = c.tone === "accent";
+            return (
+              <Link
+                key={c.title}
+                to={c.to}
+                style={{ animationDelay: `${i * 40}ms` }}
+                className={`group animate-fade-in relative overflow-hidden rounded-3xl border p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)] ${
+                  isFeature
+                    ? "border-primary/30 bg-emerald-gradient/15 sm:col-span-2 lg:row-span-2 shadow-glow"
+                    : isAccent
+                      ? "border-accent/30 bg-amber-gradient/10 lg:col-span-2"
+                      : "border-border bg-card hover:border-primary/40"
+                }`}
+              >
+                <div className={`mb-4 grid h-11 w-11 place-items-center rounded-2xl transition-transform group-hover:scale-110 ${
+                  isFeature ? "bg-emerald-gradient text-primary-foreground shadow-glow" :
+                  isAccent ? "bg-amber-gradient text-accent-foreground" :
+                  "bg-secondary text-primary"
+                }`}>
+                  <c.icon className={isFeature ? "h-6 w-6" : "h-5 w-5"} />
+                </div>
+                <h3 className={`font-display font-bold tracking-tight ${isFeature ? "text-2xl" : "text-base"}`}>
+                  {c.title}
+                </h3>
+                <p className={`mt-1 text-muted-foreground ${isFeature ? "text-sm" : "text-xs"}`}>{c.desc}</p>
+                <ArrowRight className="absolute right-5 top-5 h-4 w-4 text-muted-foreground/50 opacity-0 transition-all group-hover:right-4 group-hover:opacity-100" />
+              </Link>
+            );
+          })}
         </div>
 
         {isTeacher && (
           <Link to="/teacher"
-            className="mt-6 flex items-center justify-between rounded-2xl border border-primary/30 bg-primary/5 p-5 transition hover:bg-primary/10">
+            className="mt-6 flex items-center justify-between rounded-3xl border border-primary/30 bg-primary/5 p-5 transition hover:bg-primary/10">
             <div className="flex items-center gap-3">
               <GraduationCap className="h-6 w-6 text-primary" />
               <div>
@@ -179,7 +169,7 @@ function Dashboard() {
 
         {isAdmin && aiCost && (
           <Link to="/admin"
-            className={`mt-6 flex items-center justify-between rounded-2xl border p-5 transition ${
+            className={`mt-6 flex items-center justify-between rounded-3xl border p-5 transition ${
               aiCost.overBudget
                 ? "border-destructive bg-destructive/10 hover:bg-destructive/15"
                 : aiCost.overAlert
@@ -207,66 +197,83 @@ function Dashboard() {
           </Link>
         )}
 
-        <section className="mt-10">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Sessions à venir</h2>
-            <Link to="/teachers" className="text-xs text-primary hover:underline">Réserver un autre créneau →</Link>
-          </div>
-          {upcoming.length === 0 ? (
-            <div className="mt-3 rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">Aucune session à venir.</div>
-          ) : (
-            <div className="mt-3 grid gap-2">
-              {upcoming.map((b) => (
-                <Link key={b.id} to="/live/$sessionId" params={{ sessionId: b.session!.id }}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 hover:border-primary/40">
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary"><Video className="h-4 w-4" /></div>
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold">{b.session!.title ?? b.session!.subject}</div>
-                    <div className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {new Date(b.session!.scheduled_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })} · {b.session!.duration_min} min · {b.mode}
+        <div className="mt-12 grid gap-8 lg:grid-cols-3">
+          <section className="lg:col-span-2">
+            <SectionHeader title="Sessions à venir" cta="Réserver un créneau" to="/teachers" />
+            {upcoming.length === 0 ? (
+              <EmptyCard>Aucune session à venir. Réserve un prof pour continuer.</EmptyCard>
+            ) : (
+              <div className="mt-4 grid gap-2">
+                {upcoming.map((b) => (
+                  <Link key={b.id} to="/live/$sessionId" params={{ sessionId: b.session!.id }}
+                    className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition hover:border-primary/40 hover:bg-card/80">
+                    <div className="grid h-11 w-11 place-items-center rounded-xl bg-emerald-gradient/15 text-primary"><Video className="h-4 w-4" /></div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold">{b.session!.title ?? b.session!.subject}</div>
+                      <div className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> {new Date(b.session!.scheduled_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })} · {b.session!.duration_min} min
+                      </div>
                     </div>
-                  </div>
-                  <span className="text-xs text-primary">→</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground/50 transition group-hover:translate-x-0.5 group-hover:text-primary" />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
 
-        <section className="mt-10">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Mes cours</h2>
-            <Link to="/courses" className="text-xs text-primary hover:underline">Découvrir plus →</Link>
-          </div>
-          {enrollments.length === 0 ? (
-            <div className="mt-3 rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">Tu n'es inscrit à aucun cours.</div>
-          ) : (
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              {enrollments.map((e) => e.course && (
-                <Link key={e.id} to="/courses/$courseId" params={{ courseId: e.course.id }}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 hover:border-primary/40">
-                  <div className="grid h-12 w-16 place-items-center overflow-hidden rounded-lg bg-primary/10 text-primary">
-                    {e.course.thumbnail_url ? <img src={e.course.thumbnail_url} alt="" className="h-full w-full object-cover" /> : <BookOpen className="h-4 w-4" />}
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold line-clamp-1">{e.course.title}</div>
-                    <div className="text-xs text-muted-foreground">{e.course.subject}</div>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full bg-primary" style={{ width: `${e.progress}%` }} />
+          <section>
+            <SectionHeader title="Mes cours" cta="Explorer" to="/courses" />
+            {enrollments.length === 0 ? (
+              <EmptyCard>Aucun cours en cours. Explore le catalogue.</EmptyCard>
+            ) : (
+              <div className="mt-4 space-y-2">
+                {enrollments.slice(0, 4).map((e) => e.course && (
+                  <Link key={e.id} to="/courses/$courseId" params={{ courseId: e.course.id }}
+                    className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 transition hover:border-primary/40">
+                    <div className="grid h-11 w-14 place-items-center overflow-hidden rounded-lg bg-primary/10 text-primary">
+                      {e.course.thumbnail_url ? <img src={e.course.thumbnail_url} alt="" className="h-full w-full object-cover" /> : <BookOpen className="h-4 w-4" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold">{e.course.title}</div>
+                      <div className="mt-1 h-1 overflow-hidden rounded-full bg-secondary">
+                        <div className="h-full bg-emerald-gradient transition-all" style={{ width: `${e.progress}%` }} />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+
+        {notifs.length > 0 && (
+          <section className="mt-12">
+            <SectionHeader title="Dernières notifications" />
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              {notifs.slice(0, 6).map((n) => (
+                <Link key={n.id} to={n.link ?? "/dashboard"}
+                  onClick={() => !n.read_at && markRead({ data: { id: n.id } })}
+                  className="rounded-2xl border border-border bg-card p-3 transition hover:border-primary/40">
+                  <div className="flex items-start gap-2">
+                    {!n.read_at && <span className="mt-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary" />}
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium">{n.title}</div>
+                      {n.body && <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{n.body}</div>}
+                      <div className="mt-1 text-[10px] text-muted-foreground/70">{new Date(n.created_at).toLocaleString("fr-FR")}</div>
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
-          )}
-        </section>
+          </section>
+        )}
 
         {past.length > 0 && (
-          <section className="mt-10">
-            <h2 className="text-lg font-semibold">Sessions passées</h2>
-            <div className="mt-3 grid gap-2">
+          <section className="mt-12">
+            <SectionHeader title="Sessions passées" />
+            <div className="mt-4 grid gap-2">
               {past.slice(0, 5).map((b) => (
-                <div key={b.id} className="flex items-center justify-between rounded-xl border border-border/60 bg-card/60 p-3 text-sm">
+                <div key={b.id} className="flex items-center justify-between rounded-2xl border border-border/60 bg-card/60 p-3 text-sm">
                   <span>{b.session!.title ?? b.session!.subject}</span>
                   <span className="text-xs text-muted-foreground">{new Date(b.session!.scheduled_at).toLocaleDateString("fr-FR")}</span>
                 </div>
@@ -274,7 +281,40 @@ function Dashboard() {
             </div>
           </section>
         )}
-      </main>
+      </div>
+    </div>
+  );
+}
+
+function StatPill({ icon, tone, children }: { icon: React.ReactNode; tone: "emerald" | "amber" | "neutral"; children: React.ReactNode }) {
+  const cls =
+    tone === "emerald"
+      ? "border-primary/40 bg-primary/10 text-primary"
+      : tone === "amber"
+        ? "border-accent/40 bg-accent/10 text-accent"
+        : "border-border bg-card/60 text-muted-foreground";
+  return (
+    <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${cls}`}>
+      {icon}{children}
+    </div>
+  );
+}
+
+function SectionHeader({ title, cta, to }: { title: string; cta?: string; to?: "/teachers" | "/courses" }) {
+  return (
+    <div className="flex items-baseline justify-between">
+      <h2 className="font-display text-xl font-bold tracking-tight">{title}</h2>
+      {cta && to && (
+        <Link to={to} className="text-xs font-medium text-primary hover:underline">{cta} →</Link>
+      )}
+    </div>
+  );
+}
+
+function EmptyCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mt-4 rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
+      {children}
     </div>
   );
 }
