@@ -15,6 +15,7 @@ import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as SessionsSessionIdRouteImport } from './routes/sessions.$sessionId'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -78,6 +79,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryIndexRoute = LibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SessionsSessionIdRoute = SessionsSessionIdRouteImport.update({
@@ -291,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
+  '/library/': typeof LibraryIndexRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
   '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
@@ -332,6 +339,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
+  '/library': typeof LibraryIndexRoute
   '/admin/archive': typeof AuthenticatedAdminArchiveRoute
   '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
@@ -376,6 +384,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
+  '/library/': typeof LibraryIndexRoute
   '/_authenticated/admin_/archive': typeof AuthenticatedAdminArchiveRoute
   '/_authenticated/admin_/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/ai/sheets': typeof AuthenticatedAiSheetsRouteWithChildren
@@ -420,6 +429,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/courses/$courseId'
     | '/sessions/$sessionId'
+    | '/library/'
     | '/admin/archive'
     | '/admin/moderation'
     | '/ai/sheets'
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/courses/$courseId'
     | '/sessions/$sessionId'
+    | '/library'
     | '/admin/archive'
     | '/admin/moderation'
     | '/ai/sheets'
@@ -504,6 +515,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/courses/$courseId'
     | '/sessions/$sessionId'
+    | '/library/'
     | '/_authenticated/admin_/archive'
     | '/_authenticated/admin_/moderation'
     | '/_authenticated/ai/sheets'
@@ -541,6 +553,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TeachersRoute: typeof TeachersRoute
   SessionsSessionIdRoute: typeof SessionsSessionIdRoute
+  LibraryIndexRoute: typeof LibraryIndexRoute
   ApiChatConversationIdRoute: typeof ApiChatConversationIdRoute
   ApiPublicHooksTaskRemindersRoute: typeof ApiPublicHooksTaskRemindersRoute
 }
@@ -587,6 +600,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/': {
+      id: '/library/'
+      path: '/library'
+      fullPath: '/library/'
+      preLoaderRoute: typeof LibraryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sessions/$sessionId': {
@@ -962,6 +982,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TeachersRoute: TeachersRoute,
   SessionsSessionIdRoute: SessionsSessionIdRoute,
+  LibraryIndexRoute: LibraryIndexRoute,
   ApiChatConversationIdRoute: ApiChatConversationIdRoute,
   ApiPublicHooksTaskRemindersRoute: ApiPublicHooksTaskRemindersRoute,
 }
