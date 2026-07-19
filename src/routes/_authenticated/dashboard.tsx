@@ -48,7 +48,11 @@ function Dashboard() {
         const admin = (roles ?? []).some((r) => r.role === "admin");
         setIsAdmin(admin);
 
-        const results = await Promise.allSettled([loadEnroll(), loadBooks(), loadNotif()]);
+        const results = await Promise.allSettled([
+          withTimeout(loadEnroll(), 12000, "Chargement de tes cours"),
+          withTimeout(loadBooks(), 12000, "Chargement de tes sessions"),
+          withTimeout(loadNotif(), 12000, "Chargement des notifications"),
+        ]);
         if (results[0].status === "fulfilled") setEnrollments(results[0].value as EnrollmentRow[]);
         if (results[1].status === "fulfilled") setBookings(results[1].value as BookingRow[]);
         if (results[2].status === "fulfilled") setNotifs(results[2].value);
