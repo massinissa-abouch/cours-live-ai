@@ -4,6 +4,41 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { notify } from "./notifications.server";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+function makePublicClient() {
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+  return createClient<Database>(process.env.SUPABASE_URL!, key, {
+    auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
+    global: {
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+}
+
+export const getPublicSessionPreview = createServerFn({ method: "POST" })
+  .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data }) => {
+    const pub = makePublicClient();
+    const { data: session } = await pub
+      .from("live_sessions")
+      .select("id,title,subject,scheduled_at,duration_min,session_type,max_students,price_per_student,status")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!session) return null;
+    const { count } = await pub
+      .from("session_bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("session_id", session.id)
+      .in("status", ["booked", "attended"]);
+    return { session, bookedCount: count ?? 0 };
+  });
 
 export const getSessionDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
