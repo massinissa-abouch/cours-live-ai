@@ -7,11 +7,15 @@ export const Route = createFileRoute("/_authenticated/tools/countdown")({
   component: CountdownPage,
 });
 
-// Dates par défaut si aucune ligne en base (fenêtres officielles typiques juin)
-const FALLBACK: Record<"bem" | "bac", string> = {
-  bem: `${new Date().getFullYear()}-06-10`,
-  bac: `${new Date().getFullYear()}-06-15`,
-};
+// Dates par défaut si aucune ligne en base — roule vers l'année suivante si déjà passée.
+function fallbackDate(exam: "bem" | "bac"): string {
+  const md = exam === "bac" ? "06-15" : "06-10";
+  const now = new Date();
+  const y = now.getFullYear();
+  const thisYear = new Date(`${y}-${md}`);
+  const targetYear = thisYear.getTime() < now.getTime() ? y + 1 : y;
+  return `${targetYear}-${md}`;
+}
 
 type ChecklistItem = { id: string; subject: string; chapter: string; done: boolean };
 
@@ -45,7 +49,7 @@ function CountdownPage() {
         .order("year", { ascending: false })
         .limit(1)
         .maybeSingle();
-      setExamDate(row?.exam_date ?? FALLBACK[target]);
+      setExamDate(row?.exam_date ?? fallbackDate(target));
     })();
 
     try {
@@ -70,7 +74,7 @@ function CountdownPage() {
     const { data: row } = await supabase
       .from("exam_countdowns").select("exam_date").eq("exam", v)
       .order("year", { ascending: false }).limit(1).maybeSingle();
-    setExamDate(row?.exam_date ?? FALLBACK[v]);
+    setExamDate(row?.exam_date ?? fallbackDate(v));
   }
 
   function addItem() {
