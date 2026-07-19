@@ -2143,6 +2143,7 @@ export type Database = {
         Args: { _parent: string; _student: string }
         Returns: boolean
       }
+      join_group_by_code: { Args: { _code: string }; Returns: string }
       ping_streak: {
         Args: { _user: string }
         Returns: {
