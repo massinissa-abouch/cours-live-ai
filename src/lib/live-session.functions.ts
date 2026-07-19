@@ -56,15 +56,7 @@ export const bookSession = createServerFn({ method: "POST" })
       throw new Error("Ce créneau est déjà passé.");
     }
 
-    const { count } = await context.supabase
-      .from("session_bookings")
-      .select("id", { count: "exact", head: true })
-      .eq("session_id", session.id)
-      .in("status", ["booked", "attended"]);
-    if ((count ?? 0) >= session.max_students) {
-      throw new Error("La session est complète");
-    }
-    // Prevent double booking (also enforced by unique constraint)
+    // M2: check idempotent "already booked" BEFORE capacity
     const { data: existing } = await context.supabase
       .from("session_bookings")
       .select("id,status")
@@ -73,6 +65,15 @@ export const bookSession = createServerFn({ method: "POST" })
       .maybeSingle();
     if (existing && existing.status !== "cancelled") {
       return { ok: true, alreadyBooked: true };
+    }
+
+    const { count } = await context.supabase
+      .from("session_bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("session_id", session.id)
+      .in("status", ["booked", "attended"]);
+    if ((count ?? 0) >= session.max_students) {
+      throw new Error("La session est complète");
     }
     const mode = session.session_type === "group" ? "group" : "solo";
 
