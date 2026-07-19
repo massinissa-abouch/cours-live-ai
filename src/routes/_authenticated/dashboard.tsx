@@ -38,25 +38,31 @@ function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const { data: prof } = await supabase
-        .from("student_profiles").select("school_level").eq("user_id", user.id).maybeSingle();
-      if (!prof?.school_level) { navigate({ to: "/onboarding" }); return; }
-      const { data: roles } = await supabase
-        .from("user_roles").select("role").eq("user_id", user.id);
-      setIsTeacher((roles ?? []).some((r) => r.role === "teacher"));
-      const admin = (roles ?? []).some((r) => r.role === "admin");
-      setIsAdmin(admin);
-      const [e, b, n] = await Promise.all([loadEnroll(), loadBooks(), loadNotif()]);
-      setEnrollments(e as EnrollmentRow[]);
-      setBookings(b as BookingRow[]);
-      setNotifs(n);
-      if (admin) {
-        try { setAiCost(await loadCost()); } catch { /* ignore */ }
-      }
       try {
-        await ping();
-        setGrowth(await loadGrowth());
-      } catch { /* ignore */ }
+        const { data: prof } = await supabase
+          .from("student_profiles").select("school_level").eq("user_id", user.id).maybeSingle();
+        if (!prof?.school_level) { navigate({ to: "/onboarding" }); return; }
+        const { data: roles } = await supabase
+          .from("user_roles").select("role").eq("user_id", user.id);
+        setIsTeacher((roles ?? []).some((r) => r.role === "teacher"));
+        const admin = (roles ?? []).some((r) => r.role === "admin");
+        setIsAdmin(admin);
+
+        const results = await Promise.allSettled([loadEnroll(), loadBooks(), loadNotif()]);
+        if (results[0].status === "fulfilled") setEnrollments(results[0].value as EnrollmentRow[]);
+        if (results[1].status === "fulfilled") setBookings(results[1].value as BookingRow[]);
+        if (results[2].status === "fulfilled") setNotifs(results[2].value);
+
+        if (admin) {
+          try { setAiCost(await loadCost()); } catch { /* ignore */ }
+        }
+        try {
+          await ping();
+          setGrowth(await loadGrowth());
+        } catch { /* ignore */ }
+      } catch (err) {
+        console.error("dashboard load failed", err);
+      }
     })();
   }, [user.id, navigate, loadEnroll, loadBooks, loadNotif, loadCost, ping, loadGrowth]);
 
