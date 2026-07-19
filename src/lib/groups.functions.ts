@@ -67,17 +67,10 @@ export const joinGroupByCode = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ code: z.string().trim().min(4).max(20) }).parse(i))
   .handler(async ({ data, context }) => {
     const code = data.code.toUpperCase();
-    const { data: g } = await context.supabase
-      .from("study_groups")
-      .select("id")
-      .eq("invite_code", code)
-      .maybeSingle();
-    if (!g) throw new Error("Code invalide");
-    const { error } = await context.supabase
-      .from("group_members")
-      .insert({ group_id: g.id, user_id: context.userId });
-    if (error && !error.message.includes("duplicate")) throw error;
-    return { id: g.id };
+    const { data: gid, error } = await (context.supabase as any)
+      .rpc("join_group_by_code", { _code: code });
+    if (error) throw new Error(error.message || "Code invalide");
+    return { id: gid as string };
   });
 
 export const leaveGroup = createServerFn({ method: "POST" })
