@@ -32,12 +32,7 @@ export const getPublicSessionPreview = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     if (!session) return null;
-    const { count } = await pub
-      .from("session_bookings")
-      .select("id", { count: "exact", head: true })
-      .eq("session_id", session.id)
-      .in("status", ["booked", "attended"]);
-    return { session, bookedCount: count ?? 0 };
+    return { session, bookedCount: 0 };
   });
 
 export const getSessionDetail = createServerFn({ method: "POST" })
