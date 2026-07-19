@@ -8,6 +8,7 @@ import { listMyBookings } from "@/lib/live-session.functions";
 import { listMyNotifications, markNotificationRead } from "@/lib/notifications.functions";
 import { getAiCostSummary } from "@/lib/ai-cost.functions";
 import { pingStreak, getGrowthStatus } from "@/lib/growth.functions";
+import { withTimeout } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
