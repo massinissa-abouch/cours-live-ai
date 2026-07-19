@@ -302,7 +302,23 @@ type Q = { kind: "truefalse"; question: string; answer: boolean; explanation?: s
 function pickQuizForBlock(block: { title: string; key_points: string[] }, all: Q[]): Q[] {
   if (all.length === 0) return [];
   const bag = [block.title, ...block.key_points].join(" ").toLowerCase();
-  const scored = all.map((q) => ({ q, s: (bag.match(new RegExp(q.question.split(" ").slice(0, 3).join("|").toLowerCase(), "g")) || []).length }));
+  const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const scored = all.map((q) => {
+    const words = q.question
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((w) => w.length > 2)
+      .slice(0, 3)
+      .map(escapeRe)
+      .filter(Boolean);
+    if (words.length === 0) return { q, s: 0 };
+    try {
+      const re = new RegExp(words.join("|"), "g");
+      return { q, s: (bag.match(re) || []).length };
+    } catch {
+      return { q, s: 0 };
+    }
+  });
   scored.sort((a, b) => b.s - a.s);
   const picked = scored.slice(0, 3).map((x) => x.q);
   return picked.length ? picked : all.slice(0, Math.min(3, all.length));

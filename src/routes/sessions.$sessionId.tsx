@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Users, User, Clock, Calendar, Video, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getSessionDetail, bookSession } from "@/lib/live-session.functions";
+import { getSessionDetail, bookSession, getPublicSessionPreview } from "@/lib/live-session.functions";
 
 export const Route = createFileRoute("/sessions/$sessionId")({
   component: SessionDetail,
@@ -27,6 +27,7 @@ function SessionDetail() {
   const navigate = useNavigate();
   const load = useServerFn(getSessionDetail);
   const book = useServerFn(bookSession);
+  const loadPublic = useServerFn(getPublicSessionPreview);
 
   const [session, setSession] = useState<Session | null>(null);
   const [bookedCount, setBookedCount] = useState(0);
@@ -54,7 +55,19 @@ function SessionDetail() {
   }
 
   useEffect(() => {
-    if (authed !== false) refresh();
+    if (authed === null) return;
+    if (authed) {
+      refresh();
+    } else {
+      loadPublic({ data: { id: sessionId } })
+        .then((res) => {
+          if (res?.session) {
+            setSession(res.session as Session);
+            setBookedCount(res.bookedCount);
+          }
+        })
+        .catch((e) => toast.error(e instanceof Error ? e.message : "Erreur"));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, authed]);
 
